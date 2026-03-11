@@ -45,12 +45,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SightingListScreen(modifier: Modifier = Modifier) {
     val sightings = listOf(
-        Sighting("Lion", true, "Sleeping near the rocks"),
-        Sighting("Elephant", false, ""),
-        Sighting("Zebra", true, "Near the water area"),
-        Sighting("Giraffe", false, ""),
-        Sighting("Monkey", true, "Climbing the tree"),
-        Sighting("Penguin", false, "")
+        Sighting("Lion", true, "Running behind the Zebra"),
+        Sighting("Elephant", false, "Watching the Lion chase the Zebra"),
+        Sighting("Zebra", true, "Running away from the lion"),
+        Sighting("Giraffe", false, "Eating the leaves of a tree"),
+        Sighting("Monkey", true, "Jumping from the tree the giraffe is eating to another tree"),
+        Sighting("Penguin", false, "Going in the opposite direction")
     )
 
     LazyColumn(
