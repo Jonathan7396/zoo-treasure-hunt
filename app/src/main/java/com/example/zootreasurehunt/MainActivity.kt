@@ -21,6 +21,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Card
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 data class Sighting(
     val name: String,
@@ -50,7 +59,9 @@ fun SightingListScreen(modifier: Modifier = Modifier) {
         Sighting("Zebra", true, "Running away from the lion"),
         Sighting("Giraffe", false, "Eating the leaves of a tree"),
         Sighting("Monkey", true, "Jumping from the tree the giraffe is eating to another tree"),
-        Sighting("Penguin", false, "Going in the opposite direction")
+        Sighting("Penguin", false, "Going in the opposite direction"),
+        Sighting(name = "Hipo", isFound = true, notes = "Coming out of water"),
+        Sighting(name = "Rhino", isFound = false,"Enjoying the sun")
     )
 
     LazyColumn(
@@ -70,23 +81,39 @@ fun SightingListScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
+    val cardColor = if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5)
+    val textColor = if (sighting.isFound) Color(0xFF2E7D32) else Color.Black
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
-            .clickable { onClick() }
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = sighting.name)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Column(modifier = Modifier.weight(1F)) {
+                Text(
+                    text = sighting.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
 
-            if (sighting.isFound) {
-                Text(text = stringResource(R.string.found_label))
-            }
+                if (sighting.isFound && sighting.notes.isNotEmpty()) {
+                    Text(
+                        text = sighting.notes,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
 
-            if (sighting.notes.isNotBlank()) {
-                Text(text = sighting.notes)
+
             }
         }
+
     }
 }
 
@@ -98,7 +125,7 @@ fun AnimalCardPreview() {
             sighting = Sighting(
                 name = "Lion",
                 isFound = true,
-                notes = "Sleeping near the rocks"
+                notes = "Running behind the Zebra"
             ),
             onClick = {}
         )
