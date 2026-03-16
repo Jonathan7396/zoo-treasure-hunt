@@ -30,7 +30,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.Button
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 data class Sighting(
     val name: String,
     var isFound: Boolean = false,
@@ -42,15 +61,71 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ZooTreasureHuntTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SightingListScreen(modifier = Modifier.padding(innerPadding))
-                }
+            MaterialTheme {
+                ZooApp()
             }
         }
     }
 }
 
+@Composable
+fun ZooApp() {
+    var sightings by rememberSaveable {
+        mutableStateOf(
+            listOf(
+                Sighting("Lion"),
+                Sighting("Red Panda"),
+                Sighting("Giraffe"),
+                Sighting("Kangaroo"),
+                Sighting("Penguin")
+            )
+        )
+    }
+
+    var selectedSighting by remember { mutableStateOf<Sighting?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            sightings.forEach { animal ->
+                AnimalCard(sighting = animal) {
+                    selectedSighting = animal
+                    showDialog = true
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
+        if (showDialog) {
+            selectedSighting?.let { sighting ->
+                EditSightingDialog(
+                    sighting = sighting,
+                    onDismiss = { showDialog = false },
+                    onSave = { updatedSighting ->
+                        sightings = sightings.map {
+                            if (it.name == updatedSighting.name) updatedSighting else it
+                        }
+                        showDialog = false
+                    }
+                )
+            }
+        }
+    }
+}
 @Composable
 fun SightingListScreen(modifier: Modifier = Modifier) {
     val sightings = listOf(
@@ -112,9 +187,61 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
 
 
             }
-        }
 
+            if (sighting.isFound) {
+                Text(
+                    text = stringResource(R.string.found_label),
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+            }
+        }
     }
+}
+@Composable
+fun EditSightingDialog(
+    sighting: Sighting,
+    onDismiss: () -> Unit,
+    onSave: (Sighting) -> Unit
+) {
+    var notesText by remember { mutableStateOf(sighting.notes) }
+    var isFoundChecked by remember { mutableStateOf(sighting.isFound) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = R.string.edit_animal)) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = notesText,
+                    onValueChange = { notesText = it },
+                    label = { Text(stringResource(id = R.string.notes_hint)) }
+                )
+                Row(
+                    modifier = Modifier.padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isFoundChecked,
+                        onCheckedChange = { isFoundChecked = it }
+                    )
+                    Text(text = stringResource(id = R.string.checkbox_found))
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                onSave(sighting.copy(isFound = isFoundChecked, notes = notesText))
+            }) {
+                Text(text = stringResource(id = R.string.save_btn))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = R.string.cancel_btn))
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)
