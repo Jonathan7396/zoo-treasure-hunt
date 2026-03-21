@@ -1,9 +1,13 @@
 package com.example.zootreasurehunt
+
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
+@Serializable
 data class Sighting(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
     var isFound: Boolean = false,
-    var notes: String = ""
+    var notes: String = "",
+    val imageUrl: String = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
 )
