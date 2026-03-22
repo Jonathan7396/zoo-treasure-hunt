@@ -1,51 +1,47 @@
 package com.example.zootreasurehunt
 
-import androidx.compose.foundation.layout.Arrangement
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.material3.CardDefaults
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Card
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.Button
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,36 +57,74 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ZooApp() {
-    val sightings = remember {
-        mutableStateListOf(
-            Sighting(name = "Lion"),
-            Sighting(name = "Red Panda"),
-            Sighting(name = "Giraffe"),
-            Sighting(name = "Kangaroo"),
-            Sighting(name = "Penguin")
+    val navController = rememberNavController()
+
+    var sightings by rememberSaveable {
+        mutableStateOf(
+            listOf(
+                Sighting(name = "Lion"),
+                Sighting(name = "Red Panda"),
+                Sighting(name = "Giraffe"),
+                Sighting(name = "Kangaroo"),
+                Sighting(name = "Penguin")
+            )
         )
     }
 
     var selectedSighting by remember { mutableStateOf<Sighting?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    val bottomItems = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.About
+    )
 
-        // ✅ REPLACED Column with SightingListScreen (ONLY CHANGE)
-        SightingListScreen(
-            sightings = sightings,
-            onDelete = { animal ->
-                sightings.remove(animal)
-            },
-            onEditClick = { animal ->
-                selectedSighting = animal
-                showDialog = true
-            },
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-        )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                bottomItems.forEach { item ->
+                    val isSelected = currentDestination?.hasRoute(item.route::class) == true
+
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = { Icon(item.icon, contentDescription = item.label) },
+                        label = { Text(item.label) }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = HomeDestination,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable<HomeDestination> {
+                ListScreen(
+                    sightings = sightings,
+                    onEditClick = { animal ->
+                        selectedSighting = animal
+                        showDialog = true
+                    }
+                )
+            }
+
+            composable<AboutDestination> {
+                AboutScreen()
+            }
+        }
 
         if (showDialog) {
             selectedSighting?.let { sighting ->
@@ -100,50 +134,14 @@ fun ZooApp() {
                     onSave = { updated ->
                         val index = sightings.indexOfFirst { it.id == updated.id }
                         if (index != -1) {
-                            sightings[index] = updated
+                            sightings = sightings.toMutableList().also {
+                                it[index] = updated
+                            }
                         }
                         showDialog = false
                     }
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun SightingListScreen(
-    sightings: List<Sighting>,
-    onDelete: (Sighting) -> Unit,
-    onEditClick: (Sighting) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val listState = rememberLazyListState()
-
-    LazyColumn(
-        state = listState,
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            Text(
-                text = stringResource(id = R.string.app_name),
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-        }
-
-        items(
-            items = sightings,
-            key = { it.id }
-        ) { animal ->
-            SwipeableSighting(
-                sighting = animal,
-                onEditClick = { onEditClick(animal) },
-                onSwipe = { onDelete(animal) }
-            )
         }
     }
 }
@@ -164,7 +162,7 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1F)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = sighting.name,
                     fontSize = 20.sp,
