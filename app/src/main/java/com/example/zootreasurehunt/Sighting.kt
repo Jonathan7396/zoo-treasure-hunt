@@ -1,5 +1,8 @@
 package com.example.zootreasurehunt
 
+
+
+
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -11,3 +14,4 @@ data class Sighting(
     var notes: String = "",
     val imageUrl: String = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
 )
+

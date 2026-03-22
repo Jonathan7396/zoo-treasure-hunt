@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -24,9 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +42,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.zootreasurehunt.data.SightingRepository
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,17 +67,22 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ZooApp() {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val repository = remember { SightingRepository(context) }
+    val scope = rememberCoroutineScope()
 
-    var sightings by rememberSaveable {
-        mutableStateOf(
-            listOf(
-                Sighting(name = "Lion"),
-                Sighting(name = "Red Panda"),
-                Sighting(name = "Giraffe"),
-                Sighting(name = "Kangaroo"),
-                Sighting(name = "Penguin")
-            )
-        )
+    var sightings by remember { mutableStateOf(emptyList<Sighting>()) }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            sightings = repository.loadSightings()
+        }
+    }
+    fun saveData(newList: List<Sighting>) {
+        sightings = newList
+        scope.launch(Dispatchers.IO) {
+            repository.saveSightings(newList)
+        }
     }
 
     var selectedSighting by remember { mutableStateOf<Sighting?>(null) }
@@ -117,6 +131,10 @@ fun ZooApp() {
                     onEditClick = { animal ->
                         selectedSighting = animal
                         showDialog = true
+                    },
+                    onDelete = { animal ->
+                        val newList = sightings.filter { it.id != animal.id }
+                        saveData(newList)
                     }
                 )
             }
@@ -132,12 +150,8 @@ fun ZooApp() {
                     sighting = sighting,
                     onDismiss = { showDialog = false },
                     onSave = { updated ->
-                        val index = sightings.indexOfFirst { it.id == updated.id }
-                        if (index != -1) {
-                            sightings = sightings.toMutableList().also {
-                                it[index] = updated
-                            }
-                        }
+                        val newList = sightings.map { if (it.id == updated.id) updated else it }
+                        saveData(newList)
                         showDialog = false
                     }
                 )
@@ -162,6 +176,14 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            AsyncImage(
+                model = sighting.imageUrl,
+                contentDescription = sighting.name,
+                modifier = Modifier
+                    .size(64.dp)
+                    .padding(end = 8.dp)
+            )
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = sighting.name,
