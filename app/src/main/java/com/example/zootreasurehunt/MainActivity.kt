@@ -51,7 +51,12 @@ import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
-
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.zootreasurehunt.worker.CongratulationWorker
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,10 +75,17 @@ fun ZooApp() {
     val context = LocalContext.current
     val repository = remember { SightingRepository(context) }
     val scope = rememberCoroutineScope()
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { }
+    )
 
     var sightings by remember { mutableStateOf(emptyList<Sighting>()) }
 
     LaunchedEffect(Unit) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
         withContext(Dispatchers.IO) {
             sightings = repository.loadSightings()
         }
@@ -150,6 +162,13 @@ fun ZooApp() {
                     sighting = sighting,
                     onDismiss = { showDialog = false },
                     onSave = { updated ->
+                        if (updated.isFound && selectedSighting?.isFound == false) {
+                            val workRequest = OneTimeWorkRequestBuilder<CongratulationWorker>()
+                                .setInputData(workDataOf("ANIMAL_NAME" to updated.name))
+                                .build()
+
+                            WorkManager.getInstance(context).enqueue(workRequest)
+                        }
                         val newList = sightings.map { if (it.id == updated.id) updated else it }
                         saveData(newList)
                         showDialog = false
