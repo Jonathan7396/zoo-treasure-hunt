@@ -1,20 +1,28 @@
 package com.example.zootreasurehunt.data
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import com.example.zootreasurehunt.Sighting
 import android.content.Context
+import com.example.zootreasurehunt.Sighting
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+
 class SightingRepository(private val context: Context) {
 
     private val fileName = "sightings.json"
-    fun saveSightings(sightings: List<Sighting>) {
-        val jsonString = Json.encodeToString(sightings)
 
-        context.openFileOutput(fileName, Context.MODE_PRIVATE).use { outputStream ->
-            outputStream.write(jsonString.toByteArray())
+    suspend fun saveSightings(sightings: List<Sighting>) {
+        withContext(Dispatchers.IO) {
+            val jsonString = Json.encodeToString(sightings)
+
+            context.openFileOutput(fileName, Context.MODE_PRIVATE).use { outputStream ->
+                outputStream.write(jsonString.toByteArray())
+            }
         }
     }
+
     private fun getDefaultSightings(): List<Sighting> {
         return listOf(
             Sighting(name = "Lion", imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"),
@@ -25,21 +33,21 @@ class SightingRepository(private val context: Context) {
         )
     }
 
-    fun loadSightings(): List<Sighting> {
-        val file = File(context.filesDir, fileName)
+    suspend fun loadSightings(): List<Sighting> {
+        return withContext(Dispatchers.IO) {
+            val file = File(context.filesDir, fileName)
 
-        if (!file.exists()) {
-            return getDefaultSightings()
-        }
+            if (!file.exists()) return@withContext getDefaultSightings()
 
-        return try {
-            val jsonString = context.openFileInput(fileName)
-                .bufferedReader()
-                .use { it.readText() }
+            try {
+                val jsonString = context.openFileInput(fileName)
+                    .bufferedReader()
+                    .use { it.readText() }
 
-            Json.decodeFromString(jsonString)
-        } catch (e: Exception) {
-            getDefaultSightings()
+                Json.decodeFromString<List<Sighting>>(jsonString)
+            } catch (e: Exception) {
+                getDefaultSightings()
+            }
         }
     }
 }

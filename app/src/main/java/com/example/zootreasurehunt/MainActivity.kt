@@ -57,6 +57,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.example.zootreasurehunt.worker.CongratulationWorker
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import com.example.zootreasurehunt.viewmodel.ZooViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,30 +75,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ZooApp() {
     val navController = rememberNavController()
-    val context = LocalContext.current
-    val repository = remember { SightingRepository(context) }
-    val scope = rememberCoroutineScope()
+    val viewModel: ZooViewModel = viewModel()
+    val sightings by viewModel.sightings.collectAsState()
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { }
     )
 
-    var sightings by remember { mutableStateOf(emptyList<Sighting>()) }
+
 
     LaunchedEffect(Unit) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
-        withContext(Dispatchers.IO) {
-            sightings = repository.loadSightings()
-        }
+
     }
-    fun saveData(newList: List<Sighting>) {
-        sightings = newList
-        scope.launch(Dispatchers.IO) {
-            repository.saveSightings(newList)
-        }
-    }
+
 
     var selectedSighting by remember { mutableStateOf<Sighting?>(null) }
     var showDialog by remember { mutableStateOf(false) }
@@ -145,8 +141,7 @@ fun ZooApp() {
                         showDialog = true
                     },
                     onDelete = { animal ->
-                        val newList = sightings.filter { it.id != animal.id }
-                        saveData(newList)
+                        viewModel.deleteSighting(animal)
                     }
                 )
             }
@@ -162,15 +157,7 @@ fun ZooApp() {
                     sighting = sighting,
                     onDismiss = { showDialog = false },
                     onSave = { updated ->
-                        if (updated.isFound && selectedSighting?.isFound == false) {
-                            val workRequest = OneTimeWorkRequestBuilder<CongratulationWorker>()
-                                .setInputData(workDataOf("ANIMAL_NAME" to updated.name))
-                                .build()
-
-                            WorkManager.getInstance(context).enqueue(workRequest)
-                        }
-                        val newList = sightings.map { if (it.id == updated.id) updated else it }
-                        saveData(newList)
+                        viewModel.updateSighting(updated)
                         showDialog = false
                     }
                 )

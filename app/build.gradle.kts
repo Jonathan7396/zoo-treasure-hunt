@@ -67,4 +67,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
 }
