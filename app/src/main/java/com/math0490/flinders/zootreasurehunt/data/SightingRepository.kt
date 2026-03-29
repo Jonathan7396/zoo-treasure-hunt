@@ -5,8 +5,6 @@ import com.math0490.flinders.zootreasurehunt.Sighting
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class SightingRepository(private val context: Context) {

@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,19 +43,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.math0490.flinders.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.rememberCoroutineScope
-import com.math0490.flinders.zootreasurehunt.data.SightingRepository
 import androidx.compose.runtime.LaunchedEffect
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.launch
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
-import com.math0490.flinders.zootreasurehunt.worker.CongratulationWorker
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import com.math0490.flinders.zootreasurehunt.viewmodel.ZooViewModel
@@ -174,7 +163,6 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
@@ -217,7 +205,6 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
         }
     }
 }
-
 @Composable
 fun EditSightingDialog(
     sighting: Sighting,
