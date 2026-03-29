@@ -1,4 +1,4 @@
-package com.example.zootreasurehunt
+package com.math0490.flinders.zootreasurehunt
 
 
 

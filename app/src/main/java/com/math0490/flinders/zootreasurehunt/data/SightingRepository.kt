@@ -1,7 +1,7 @@
-package com.example.zootreasurehunt.data
+package com.math0490.flinders.zootreasurehunt.data
 
 import android.content.Context
-import com.example.zootreasurehunt.Sighting
+import com.math0490.flinders.zootreasurehunt.Sighting
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

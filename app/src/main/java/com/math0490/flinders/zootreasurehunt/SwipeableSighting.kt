@@ -1,4 +1,4 @@
-package com.example.zootreasurehunt
+package com.math0490.flinders.zootreasurehunt
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

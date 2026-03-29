@@ -1,4 +1,4 @@
-package com.example.zootreasurehunt
+package com.math0490.flinders.zootreasurehunt
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -43,10 +43,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
-import com.example.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
+import com.math0490.flinders.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.rememberCoroutineScope
-import com.example.zootreasurehunt.data.SightingRepository
+import com.math0490.flinders.zootreasurehunt.data.SightingRepository
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -56,10 +56,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.example.zootreasurehunt.worker.CongratulationWorker
+import com.math0490.flinders.zootreasurehunt.worker.CongratulationWorker
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
-import com.example.zootreasurehunt.viewmodel.ZooViewModel
+import com.math0490.flinders.zootreasurehunt.viewmodel.ZooViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

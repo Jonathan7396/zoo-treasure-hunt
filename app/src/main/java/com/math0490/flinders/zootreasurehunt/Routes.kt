@@ -1,4 +1,4 @@
-package com.example.zootreasurehunt
+package com.math0490.flinders.zootreasurehunt
 
 import kotlinx.serialization.Serializable
 import androidx.compose.material.icons.Icons
