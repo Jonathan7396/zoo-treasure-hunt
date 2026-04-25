@@ -12,6 +12,7 @@ data class Sighting(
     val name: String,
     var isFound: Boolean = false,
     var notes: String = "",
-    val imageUrl: String = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
+    val imageUrl: String = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg",
+    val photoPath: String? = null
 )
 

@@ -49,6 +49,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import com.math0490.flinders.zootreasurehunt.viewmodel.ZooViewModel
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import com.math0490.flinders.zootreasurehunt.utils.FileUtils
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +69,7 @@ fun ZooApp() {
     val navController = rememberNavController()
     val viewModel: ZooViewModel = viewModel()
     val sightings by viewModel.sightings.collectAsState()
+    val isSortByName by viewModel.isSortByName.collectAsState(initial = true)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -87,7 +91,9 @@ fun ZooApp() {
 
     val bottomItems = listOf(
         BottomNavItem.Home,
+        BottomNavItem.Settings,
         BottomNavItem.About
+
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -134,6 +140,12 @@ fun ZooApp() {
                     }
                 )
             }
+            composable<SettingsDestination> {
+                SettingsScreen(
+                    isSortByName = isSortByName,
+                    onSortChange = { viewModel.toggleSortOrder(it) }
+                )
+            }
 
             composable<AboutDestination> {
                 AboutScreen()
@@ -159,7 +171,8 @@ fun ZooApp() {
 fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
     val cardColor = if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5)
     val textColor = if (sighting.isFound) Color(0xFF2E7D32) else Color.Black
-
+    val imageModel = sighting.photoPath ?: "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
+    //val imageModel = sighting.photoPath ?: sighting.imageUrl
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -171,7 +184,7 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = sighting.imageUrl,
+                model = imageModel,
                 contentDescription = sighting.name,
                 modifier = Modifier
                     .size(64.dp)
@@ -213,7 +226,17 @@ fun EditSightingDialog(
 ) {
     var notesText by remember { mutableStateOf(sighting.notes) }
     var isFoundChecked by remember { mutableStateOf(sighting.isFound) }
-
+    val context = LocalContext.current
+    val fileUtils = remember { FileUtils(context) }
+    var currentPhotoPath by remember { mutableStateOf(sighting.photoPath) }
+    var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && tempPhotoUri != null) {
+            currentPhotoPath = tempPhotoUri.toString()
+        }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(id = R.string.edit_animal)) },
@@ -234,11 +257,23 @@ fun EditSightingDialog(
                     )
                     Text(text = stringResource(id = R.string.checkbox_found))
                 }
+                Button(
+                    onClick = {
+                        val file = fileUtils.createImageFile()
+                        val uri = fileUtils.getUriForFile(file)
+                        tempPhotoUri = uri
+                        cameraLauncher.launch(uri)
+                    }
+                ) {
+                    Text(
+                        text = if (currentPhotoPath == null) "Take Photo" else "Retake Photo"
+                    )
+                }
             }
         },
         confirmButton = {
             Button(onClick = {
-                onSave(sighting.copy(isFound = isFoundChecked, notes = notesText))
+                onSave(sighting.copy(isFound = isFoundChecked, notes = notesText,photoPath = currentPhotoPath))
             }) {
                 Text(text = stringResource(id = R.string.save_btn))
             }
