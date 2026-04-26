@@ -38,18 +38,22 @@ class ZooViewModel(
         }
 
         viewModelScope.launch {
-            combine(_rawSightings, settingsRepository.sortByNameFlow) { list, sortByName ->
+            combine(_rawSightings, settingsRepository.sortByNameFlow) { _, sortByName ->
 
                 val sortedList =
                     if (sortByName) {
-                        list.sortedBy { it.name }
+                        repository.getSortedByName()
                     } else {
-                        list.sortedByDescending { it.isFound }
+                        repository.getSortedByFound()
                     }
 
-                _uiState.value.copy(sightings = sortedList, isSortByName = sortByName)
+                _uiState.value.copy(
+                    sightings = sortedList,
+                    isSortByName = sortByName
+                )
 
-            }.collect { newState -> _uiState.value = newState
+            }.collect { newState ->
+                _uiState.value = newState
             }
         }
     }
@@ -76,7 +80,11 @@ class ZooViewModel(
     }
     fun deleteSighting(sighting: Sighting) {
         val newList = _rawSightings.value.filter { it.id != sighting.id }
-        updateAndSave(newList)
+        _rawSightings.value = newList
+
+        viewModelScope.launch {
+            repository.deleteSighting(sighting)
+        }
     }
     fun toggleSortOrder(sortByName: Boolean) {
         viewModelScope.launch {

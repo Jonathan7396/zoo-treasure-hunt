@@ -81,4 +81,11 @@ class FileSightingRepository(private val context: Context): SightingRepository {
         val currentList = loadSightings().filter { it.id != sighting.id }
         saveSightings(currentList)
     }
+    override suspend fun getSortedByName(): List<Sighting> {
+        return loadSightings().sortedBy { it.name }
+    }
+
+    override suspend fun getSortedByFound(): List<Sighting> {
+        return loadSightings().sortedByDescending { it.isFound }
+    }
 }

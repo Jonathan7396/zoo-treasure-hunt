@@ -11,5 +11,8 @@ interface SightingRepository {
     suspend fun updateSighting(sighting: Sighting)
 
     suspend fun deleteSighting(sighting: Sighting)
+    suspend fun getSortedByName(): List<Sighting>
+
+    suspend fun getSortedByFound(): List<Sighting>
 }
 

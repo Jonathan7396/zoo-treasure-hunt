@@ -52,17 +52,21 @@ import com.math0490.flinders.zootreasurehunt.ui.components.AnimalCard
 import android.app.Application
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
+import com.math0490.flinders.zootreasurehunt.data.RoomSightingRepository
+import com.math0490.flinders.zootreasurehunt.data.ZooDatabase
+
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val sightingRepository = FileSightingRepository(this)
+        val database = ZooDatabase.getDatabase(this)
+        val repository = RoomSightingRepository(database.sightingDao())
         val settingsRepository = SettingsRepository(this)
         setContent {
             MaterialTheme {
-                ZooApp(repository = sightingRepository,
+                ZooApp(repository = repository,
                     settingsRepository = settingsRepository)
             }
         }
@@ -70,7 +74,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ZooApp(repository: FileSightingRepository,
+fun ZooApp(repository: RoomSightingRepository,
            settingsRepository: SettingsRepository) {
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -103,9 +107,6 @@ fun ZooApp(repository: FileSightingRepository,
 
     }
 
-
-//    var selectedSighting by remember { mutableStateOf<Sighting?>(null) }
-//    var showDialog by remember { mutableStateOf(false) }
 
     val bottomItems = listOf(
         BottomNavItem.Home,
