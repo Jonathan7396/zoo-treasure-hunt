@@ -1,7 +1,6 @@
-package com.math0490.flinders.zootreasurehunt
+package com.math0490.flinders.zootreasurehunt.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,23 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-@Composable
-fun AboutScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Zoo Hunt\nCreated by\nJonathan Ninan Mathew",
-            fontSize = 24.sp,
-            textAlign = TextAlign.Center
-        )
-    }
-}
+import com.math0490.flinders.zootreasurehunt.R
+import com.math0490.flinders.zootreasurehunt.model.Sighting
+import com.math0490.flinders.zootreasurehunt.ui.components.SwipeableSighting
 
 @Composable
 fun ListScreen(

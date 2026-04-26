@@ -1,7 +1,4 @@
-package com.math0490.flinders.zootreasurehunt
-
-
-
+package com.math0490.flinders.zootreasurehunt.model
 
 import kotlinx.serialization.Serializable
 import java.util.UUID
@@ -15,4 +12,3 @@ data class Sighting(
     val imageUrl: String = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg",
     val photoPath: String? = null
 )
-

@@ -1,4 +1,4 @@
-package com.math0490.flinders.zootreasurehunt
+package com.math0490.flinders.zootreasurehunt.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

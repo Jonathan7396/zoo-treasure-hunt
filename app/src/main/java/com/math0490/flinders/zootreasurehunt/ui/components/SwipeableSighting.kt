@@ -1,4 +1,4 @@
-package com.math0490.flinders.zootreasurehunt
+package com.math0490.flinders.zootreasurehunt.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -24,6 +24,9 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.runtime.LaunchedEffect
+import com.math0490.flinders.zootreasurehunt.ui.components.AnimalCard
+import com.math0490.flinders.zootreasurehunt.model.Sighting
+
 enum class DragAnchors {
     START,
     END

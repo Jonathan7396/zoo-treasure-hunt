@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.math0490.flinders.zootreasurehunt.Sighting
+import com.math0490.flinders.zootreasurehunt.model.Sighting
 import com.math0490.flinders.zootreasurehunt.data.SightingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +14,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.workDataOf
 import com.math0490.flinders.zootreasurehunt.worker.CongratulationWorker
 import com.math0490.flinders.zootreasurehunt.data.SettingsRepository
+import com.math0490.flinders.zootreasurehunt.model.ZooUiState
+import kotlinx.coroutines.flow.asStateFlow
 class ZooViewModel(application: Application) : AndroidViewModel(application) {
 
 
@@ -23,22 +25,30 @@ class ZooViewModel(application: Application) : AndroidViewModel(application) {
     private val _sightings = MutableStateFlow<List<Sighting>>(emptyList())
     val sightings: StateFlow<List<Sighting>> = _sightings
     private val _rawSightings = MutableStateFlow<List<Sighting>>(emptyList())
+    private val _uiState = MutableStateFlow(ZooUiState())
+    val uiState: StateFlow<ZooUiState> = _uiState.asStateFlow()
 
     val isSortByName = settingsRepository.sortByNameFlow
     init {
-        viewModelScope.launch { _rawSightings.value = repository.loadSightings() }
         viewModelScope.launch {
-            combine(_rawSightings, settingsRepository.sortByNameFlow) { list, sortByName ->
-                if (sortByName) {
-                    list.sortedBy { it.name }
-                } else {
-                    list.sortedByDescending { it.isFound }
-                }
-            }.collect { sortedList ->
-                _sightings.value = sortedList
-            }
+            _rawSightings.value = repository.loadSightings()
         }
 
+        viewModelScope.launch {
+            combine(_rawSightings, settingsRepository.sortByNameFlow) { list, sortByName ->
+
+                val sortedList =
+                    if (sortByName) {
+                        list.sortedBy { it.name }
+                    } else {
+                        list.sortedByDescending { it.isFound }
+                    }
+
+                _uiState.value.copy(sightings = sortedList, isSortByName = sortByName)
+
+            }.collect { newState -> _uiState.value = newState
+            }
+        }
     }
     private fun updateAndSave(newList: List<Sighting>){
         _rawSightings.value = newList
@@ -70,6 +80,15 @@ class ZooViewModel(application: Application) : AndroidViewModel(application) {
             settingsRepository.setSortByName(sortByName)
         }
     }
+    fun selectSightingForEdit(sighting: Sighting?) {
+
+        _uiState.value = _uiState.value.copy(selectedSighting = sighting, isDialogVisible = sighting != null)
+
+    }
+    fun dismissDialog(){
+        _uiState.value = _uiState.value.copy(selectedSighting = null, isDialogVisible = false)
+    }
+
 
 
 }
