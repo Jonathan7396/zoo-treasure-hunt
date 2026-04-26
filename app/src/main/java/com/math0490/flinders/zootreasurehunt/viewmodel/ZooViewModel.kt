@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.math0490.flinders.zootreasurehunt.model.Sighting
 import com.math0490.flinders.zootreasurehunt.data.SightingRepository
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,11 +17,13 @@ import com.math0490.flinders.zootreasurehunt.worker.CongratulationWorker
 import com.math0490.flinders.zootreasurehunt.data.SettingsRepository
 import com.math0490.flinders.zootreasurehunt.model.ZooUiState
 import kotlinx.coroutines.flow.asStateFlow
-class ZooViewModel(application: Application) : AndroidViewModel(application) {
+class ZooViewModel(
+    private val repository: SightingRepository,
+    private val settingsRepository: SettingsRepository,
+    application: Application) : AndroidViewModel(application) {
 
 
-    private val repository = SightingRepository(application)
-    private val settingsRepository = SettingsRepository(application)
+
     private val workManager = WorkManager.getInstance(application)
     private val _sightings = MutableStateFlow<List<Sighting>>(emptyList())
     val sightings: StateFlow<List<Sighting>> = _sightings

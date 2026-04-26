@@ -1,51 +1,15 @@
 package com.math0490.flinders.zootreasurehunt.data
-
-import android.content.Context
 import com.math0490.flinders.zootreasurehunt.model.Sighting
-import java.io.File
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 
-class SightingRepository(private val context: Context) {
+interface SightingRepository {
+    suspend fun saveSightings(sightings: List<Sighting>)
 
-    private val fileName = "sightings.json"
+    suspend fun loadSightings(): List<Sighting>
 
-    suspend fun saveSightings(sightings: List<Sighting>) {
-        withContext(Dispatchers.IO) {
-            val jsonString = Json.encodeToString(sightings)
+    suspend fun addSighting(sighting: Sighting)
 
-            context.openFileOutput(fileName, Context.MODE_PRIVATE).use { outputStream ->
-                outputStream.write(jsonString.toByteArray())
-            }
-        }
-    }
+    suspend fun updateSighting(sighting: Sighting)
 
-    private fun getDefaultSightings(): List<Sighting> {
-        return listOf(
-            Sighting(name = "Lion", imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"),
-            Sighting(name = "Red Panda", imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/red-panda-ai.jpg"),
-            Sighting(name = "Giraffe", imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/giraffe-ai.jpg"),
-            Sighting(name = "Kangaroo", imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/red-kangaroo-ai.jpg"),
-            Sighting(name = "Penguin", imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/penguin-ai.jpg")
-        )
-    }
-
-    suspend fun loadSightings(): List<Sighting> {
-        return withContext(Dispatchers.IO) {
-            val file = File(context.filesDir, fileName)
-
-            if (!file.exists()) return@withContext getDefaultSightings()
-
-            try {
-                val jsonString = context.openFileInput(fileName)
-                    .bufferedReader()
-                    .use { it.readText() }
-
-                Json.decodeFromString<List<Sighting>>(jsonString)
-            } catch (e: Exception) {
-                getDefaultSightings()
-            }
-        }
-    }
+    suspend fun deleteSighting(sighting: Sighting)
 }
+

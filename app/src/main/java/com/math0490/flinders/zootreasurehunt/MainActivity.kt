@@ -16,10 +16,9 @@ import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 
+import com.math0490.flinders.zootreasurehunt.data.FileSightingRepository
+import com.math0490.flinders.zootreasurehunt.data.SettingsRepository
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,26 +49,45 @@ import com.math0490.flinders.zootreasurehunt.ui.components.EditSightingDialog
 import com.math0490.flinders.zootreasurehunt.ui.screens.ListScreen
 import com.math0490.flinders.zootreasurehunt.ui.screens.AboutScreen
 import com.math0490.flinders.zootreasurehunt.ui.components.AnimalCard
+import android.app.Application
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val sightingRepository = FileSightingRepository(this)
+        val settingsRepository = SettingsRepository(this)
         setContent {
             MaterialTheme {
-                ZooApp()
+                ZooApp(repository = sightingRepository,
+                    settingsRepository = settingsRepository)
             }
         }
     }
 }
 
 @Composable
-fun ZooApp() {
+fun ZooApp(repository: FileSightingRepository,
+           settingsRepository: SettingsRepository) {
     val navController = rememberNavController()
-    val viewModel: ZooViewModel = viewModel()
+    val context = LocalContext.current
+    val viewModel: ZooViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ZooViewModel(
+                    repository = repository,
+                    settingsRepository = settingsRepository,
+                    application = context.applicationContext as Application
+                ) as T
+            }
+        }
+    )
     val uiState by viewModel.uiState.collectAsState()
-//    val sightings by viewModel.sightings.collectAsState()
-//    val isSortByName by viewModel.isSortByName.collectAsState(initial = true)
+
+
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
