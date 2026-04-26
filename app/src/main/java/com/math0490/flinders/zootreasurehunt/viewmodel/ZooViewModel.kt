@@ -57,33 +57,31 @@ class ZooViewModel(
             }
         }
     }
-    private fun updateAndSave(newList: List<Sighting>){
-        _rawSightings.value = newList
+    private fun updateAndSave(newList: List<Sighting>) {
         viewModelScope.launch {
             repository.saveSightings(newList)
+            _rawSightings.value = repository.loadSightings()
         }
-
     }
-    fun updateSighting(updated: Sighting){
+    fun updateSighting(updated: Sighting) {
         val oldSighting = _rawSightings.value.find { it.id == updated.id }
-        if (updated.isFound && oldSighting?.isFound == false){
+
+        if (updated.isFound && oldSighting?.isFound == false) {
             val workRequest = OneTimeWorkRequestBuilder<CongratulationWorker>()
                 .setInputData(workDataOf("ANIMAL_NAME" to updated.name))
                 .build()
             workManager.enqueue(workRequest)
-
         }
-        val newList = _rawSightings.value.map { if (it.id == updated.id) updated else it }
-        updateAndSave(newList)
-
-
-    }
-    fun deleteSighting(sighting: Sighting) {
-        val newList = _rawSightings.value.filter { it.id != sighting.id }
-        _rawSightings.value = newList
 
         viewModelScope.launch {
+            repository.updateSighting(updated)
+            _rawSightings.value = repository.loadSightings()
+        }
+    }
+    fun deleteSighting(sighting: Sighting) {
+        viewModelScope.launch {
             repository.deleteSighting(sighting)
+            _rawSightings.value = repository.loadSightings()
         }
     }
     fun toggleSortOrder(sortByName: Boolean) {

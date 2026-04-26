@@ -25,6 +25,7 @@ class RoomSightingRepository(
 
     override suspend fun saveSightings(sightings: List<Sighting>) {
         sightings.forEach {
+            Log.d("DB_Save","Working save")
             dao.insert(it.toEntity())
         }
     }
