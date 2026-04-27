@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
-
+import com.math0490.flinders.zootreasurehunt.R
 @Serializable
 object HomeDestination
 @Serializable
@@ -18,25 +18,26 @@ object AboutDestination
 
 
 sealed class BottomNavItem(
-    val label: String,
+    val labelRes: Int,
     val icon: ImageVector,
     val route: Any
 ) {
     data object Home : BottomNavItem(
-        "Home",
+        R.string.home,
         Icons.Default.Home,
         HomeDestination
     )
+
     data object Settings: BottomNavItem(
-        "Settings",
+        R.string.settings,
         Icons.Filled.Settings,
         SettingsDestination
     )
+
     data object About : BottomNavItem(
-        "About",
+        R.string.about,
         Icons.Default.Info,
         AboutDestination
     )
-
 
 }

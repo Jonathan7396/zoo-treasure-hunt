@@ -20,13 +20,16 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.math0490.flinders.zootreasurehunt.R
 import com.math0490.flinders.zootreasurehunt.model.Sighting
+import java.text.DateFormat
+import java.util.Date
 
 @Composable
 fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
     val cardColor = if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5)
     val textColor = if (sighting.isFound) Color(0xFF2E7D32) else Color.Black
     val imageModel = sighting.photoPath ?: "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
-    //val imageModel = sighting.photoPath ?: sighting.imageUrl
+    val formattedTime = DateFormat.getDateTimeInstance().format(Date(sighting.timestamp))
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -60,6 +63,11 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
                         color = Color.Gray
                     )
                 }
+                Text(
+                    text = formattedTime,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
             }
 
             if (sighting.isFound) {

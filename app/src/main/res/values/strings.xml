@@ -6,4 +6,12 @@
     <string name="checkbox_found">Mark as Found</string>
     <string name="save_btn">Save</string>
     <string name="cancel_btn">Cancel</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="settings_title">Settings</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_found">Sort by Recency/Found Status</string>
+    <string name="about_text">Zoo Hunt\nCreated by\nJonathan Ninan Mathew</string>
 </resources>

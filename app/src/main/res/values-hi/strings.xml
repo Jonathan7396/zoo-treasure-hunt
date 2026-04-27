@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <string name="app_name">ज़ू ट्रेज़र हंट</string>
+        <string name="found_label">मिल गया!</string>
+        <string name="edit_animal">दृश्य संपादित करें</string>
+        <string name="notes_hint">अवलोकन नोट्स</string>
+        <string name="checkbox_found">मिल गया के रूप में चिह्नित करें</string>
+        <string name="save_btn">सहेजें</string>
+        <string name="cancel_btn">रद्द करें</string>
+        <string name="home">होम</string>
+        <string name="settings">सेटिंग्स</string>
+        <string name="about">के बारे में</string>
+        <string name="settings_title">सेटिंग्स</string>
+        <string name="sort_order">क्रमबद्ध करें</string>
+        <string name="sort_by_name">नाम के अनुसार</string>
+        <string name="sort_by_found">हाल/स्थिति के अनुसार</string>
+        <string name="about_text">ज़ू हंट\nनिर्माता\nजोनाथन निनान मैथ्यू</string>
+</resources>

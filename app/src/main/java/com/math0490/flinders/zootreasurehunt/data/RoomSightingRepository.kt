@@ -25,7 +25,6 @@ class RoomSightingRepository(
 
     override suspend fun saveSightings(sightings: List<Sighting>) {
         sightings.forEach {
-            Log.d("DB_Save","Working save")
             dao.insert(it.toEntity())
         }
     }
@@ -81,7 +80,8 @@ private fun SightingEntity.toSighting(): Sighting {
         isFound = isFound,
         notes = notes,
         imageUrl = imageUrl,
-        photoPath = photoPath
+        photoPath = photoPath,
+        timestamp = timestamp
     )
 }
 
@@ -92,6 +92,7 @@ private fun Sighting.toEntity(): SightingEntity {
         imageUrl = imageUrl,
         photoPath = photoPath,
         isFound = isFound,
-        notes = notes
+        notes = notes,
+        timestamp = timestamp
     )
 }

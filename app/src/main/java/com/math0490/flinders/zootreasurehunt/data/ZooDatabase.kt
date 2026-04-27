@@ -8,7 +8,8 @@ import com.math0490.flinders.zootreasurehunt.model.SightingEntity
 
 @Database(
     entities = [SightingEntity::class],
-    version = 1
+    version = 2,
+    exportSchema = false
 )
 abstract class ZooDatabase : RoomDatabase() {
 
@@ -24,7 +25,9 @@ abstract class ZooDatabase : RoomDatabase() {
                     context.applicationContext,
                     ZooDatabase::class.java,
                     "zoo_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(dropAllTables = true)
+                    .build()
 
                 INSTANCE = instance
                 instance

@@ -11,5 +11,8 @@ data class SightingEntity(
     val imageUrl: String,
     val photoPath: String?,
     val isFound: Boolean,
-    val notes: String
+    val notes: String,
+    val timestamp: Long
 )
+
+

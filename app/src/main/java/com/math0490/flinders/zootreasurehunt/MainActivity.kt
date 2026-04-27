@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import com.math0490.flinders.zootreasurehunt.data.RoomSightingRepository
 import com.math0490.flinders.zootreasurehunt.data.ZooDatabase
+import androidx.compose.ui.res.stringResource
 
 
 
@@ -135,8 +136,15 @@ fun ZooApp(repository: RoomSightingRepository,
                                 restoreState = true
                             }
                         },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) }
+                        icon = {
+                            Icon(
+                                item.icon,
+                                contentDescription = stringResource(item.labelRes)
+                            )
+                        },
+                        label = {
+                            Text(stringResource(item.labelRes))
+                        }
                     )
                 }
             }

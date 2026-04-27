@@ -17,6 +17,7 @@ import com.math0490.flinders.zootreasurehunt.worker.CongratulationWorker
 import com.math0490.flinders.zootreasurehunt.data.SettingsRepository
 import com.math0490.flinders.zootreasurehunt.model.ZooUiState
 import kotlinx.coroutines.flow.asStateFlow
+
 class ZooViewModel(
     private val repository: SightingRepository,
     private val settingsRepository: SettingsRepository,
@@ -57,16 +58,12 @@ class ZooViewModel(
             }
         }
     }
-    private fun updateAndSave(newList: List<Sighting>) {
-        viewModelScope.launch {
-            repository.saveSightings(newList)
-            _rawSightings.value = repository.loadSightings()
-        }
-    }
+
     fun updateSighting(updated: Sighting) {
+        val updatedWithTimestamp = updated.copy(timestamp = System.currentTimeMillis())
         val oldSighting = _rawSightings.value.find { it.id == updated.id }
 
-        if (updated.isFound && oldSighting?.isFound == false) {
+        if (updatedWithTimestamp.isFound && oldSighting?.isFound == false) {
             val workRequest = OneTimeWorkRequestBuilder<CongratulationWorker>()
                 .setInputData(workDataOf("ANIMAL_NAME" to updated.name))
                 .build()
@@ -74,7 +71,7 @@ class ZooViewModel(
         }
 
         viewModelScope.launch {
-            repository.updateSighting(updated)
+            repository.updateSighting(updatedWithTimestamp)
             _rawSightings.value = repository.loadSightings()
         }
     }

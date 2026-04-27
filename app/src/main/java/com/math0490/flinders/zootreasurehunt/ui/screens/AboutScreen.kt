@@ -8,7 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-
+import com.math0490.flinders.zootreasurehunt.R
+import androidx.compose.ui.res.stringResource
 @Composable
 fun AboutScreen() {
     Box(
@@ -16,7 +17,7 @@ fun AboutScreen() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Zoo Hunt\nCreated by\nJonathan Ninan Mathew",
+            text = stringResource(R.string.about_text),
             fontSize = 24.sp,
             textAlign = TextAlign.Center
         )

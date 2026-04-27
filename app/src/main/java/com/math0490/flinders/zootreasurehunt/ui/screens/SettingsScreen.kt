@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.compose.ui.res.stringResource
+import com.math0490.flinders.zootreasurehunt.R
 @Composable
 fun SettingsScreen(
     isSortByName: Boolean,
@@ -17,15 +18,15 @@ fun SettingsScreen(
 ) {
     Column {
 
-        Text("Settings", fontSize = 28.sp)
-        Text("Sort Order", modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+        Text(stringResource(R.string.settings_title), fontSize = 28.sp)
+        Text(stringResource(R.string.sort_order), modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
 
         Row {
             RadioButton(
                 selected = isSortByName,
                 onClick = { onSortChange(true) }
             )
-            Text("Sort by name")
+            Text(stringResource(R.string.sort_by_name))
         }
 
         Row {
@@ -33,7 +34,7 @@ fun SettingsScreen(
                 selected = !isSortByName,
                 onClick = { onSortChange(false) }
             )
-            Text("Sort by Recency/Found Status")
+            Text(stringResource(R.string.sort_by_found))
         }
     }
 }
