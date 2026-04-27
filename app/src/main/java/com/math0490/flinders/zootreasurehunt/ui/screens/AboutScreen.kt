@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.sp
 import com.math0490.flinders.zootreasurehunt.R
 import androidx.compose.ui.res.stringResource
 
-//Displays the basic functions of the app
+//Displays the apps name along with the author
 @Composable
 fun AboutScreen() {
     Box(

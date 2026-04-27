@@ -62,6 +62,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3Api
 
+
 //Defines the navigation routes for the app
 sealed class Screen(val route: String, @StringRes val titleRes: Int) {
     object Home : Screen("home", R.string.home)
@@ -70,7 +71,7 @@ sealed class Screen(val route: String, @StringRes val titleRes: Int) {
     object About : Screen("about", R.string.about)
 }
 
-//Main Entry point that initializes the db, repos and the UI
+//Main class that initializes the db, repos and the UI
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-//Root Composable that manages navigation, drawer state, and UI State
+// Composable that manages navigation, drawer state, and UI State
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ZooApp(

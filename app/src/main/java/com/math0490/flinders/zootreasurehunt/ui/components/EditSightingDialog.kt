@@ -27,7 +27,6 @@ import com.math0490.flinders.zootreasurehunt.model.Sighting
 import com.math0490.flinders.zootreasurehunt.utils.FileUtils
 
 // Displays a dialog that allows the users to add or edit a sighting.
-// When adding, only the name is visible. When editing, the name is hidden and only notes/found/photo are shown.
 @Composable
 fun EditSightingDialog(
     sighting: Sighting,

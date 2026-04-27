@@ -3,6 +3,7 @@ package com.math0490.flinders.zootreasurehunt.data
 import androidx.room.*
 import com.math0490.flinders.zootreasurehunt.model.SightingEntity
 
+
 //Dao provides direct database access for sighting entities
 @Dao
 interface SightingDao {

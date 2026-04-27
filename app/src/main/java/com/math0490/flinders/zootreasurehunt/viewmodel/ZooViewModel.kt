@@ -18,7 +18,7 @@ import com.math0490.flinders.zootreasurehunt.model.ZooUiState
 import kotlinx.coroutines.flow.asStateFlow
 import android.util.Log
 
-// View Model is responsible for managing sighting data, user preferences and coordinating database operations within the UI
+// ZooView Model is responsible for managing the sighting data, user preferences and coordinating all the  database operations within the UI
 class ZooViewModel(
     private val repository: SightingRepository,
     private val settingsRepository: SettingsRepository,
@@ -66,7 +66,7 @@ class ZooViewModel(
             }
         }
     }
-    //Updates a sighting, refreshes data and triggers a notification if the sighting is found
+
     fun updateSighting(updated: Sighting) {
         val updatedWithTimestamp = updated.copy(timestamp = System.currentTimeMillis())
         val oldSighting = _rawSightings.value.find { it.id == updated.id }
@@ -90,28 +90,28 @@ class ZooViewModel(
 
                 _rawSightings.value = repository.loadSightings()
             } catch (e: Exception) {
-                Log.e(TAG, "Error saving sighting", e)
+                Log.e(TAG, "Error saving the  sighting", e)
             }
         }
     }
-    //Deletes a sighting from the repository and refreshes data
+    //Deletes a sighting and the reloads the list
     fun deleteSighting(sighting: Sighting) {
         viewModelScope.launch {
             try {
                 repository.deleteSighting(sighting)
                 _rawSightings.value = repository.loadSightings()
             } catch (e: Exception) {
-                Log.e(TAG, "Error deleting sighting", e)
+                Log.e(TAG, "Error deleting the sighting", e)
             }
         }
     }
-    //Updates the user's sort order preference and refreshes data
+    //Updates the user's sort preference
     fun toggleSortOrder(sortByName: Boolean) {
         viewModelScope.launch {
             settingsRepository.setSortByName(sortByName)
         }
     }
-    //Sets the selected sighting and controls dialog visibility for editing
+    //Sets the selected sighting and controls the visibility of the dialog
     fun selectSightingForEdit(sighting: Sighting?) {
 
         _uiState.value = _uiState.value.copy(selectedSighting = sighting, isDialogVisible = sighting != null)
