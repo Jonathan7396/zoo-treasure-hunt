@@ -25,20 +25,25 @@ import androidx.compose.ui.unit.dp
 import com.math0490.flinders.zootreasurehunt.R
 import com.math0490.flinders.zootreasurehunt.model.Sighting
 import com.math0490.flinders.zootreasurehunt.utils.FileUtils
-import kotlin.toString
 
+// Displays a dialog that allows the users to add or edit a sighting.
+// When adding, only the name is visible. When editing, the name is hidden and only notes/found/photo are shown.
 @Composable
 fun EditSightingDialog(
     sighting: Sighting,
+    isNew: Boolean,
     onDismiss: () -> Unit,
     onSave: (Sighting) -> Unit
 ) {
+    var nameText by remember { mutableStateOf(sighting.name) }
     var notesText by remember { mutableStateOf(sighting.notes) }
     var isFoundChecked by remember { mutableStateOf(sighting.isFound) }
     val context = LocalContext.current
     val fileUtils = remember { FileUtils(context) }
     var currentPhotoPath by remember { mutableStateOf(sighting.photoPath) }
     var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
+
+    //Launches a camera and updates the photo path when an image is captured
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -46,43 +51,69 @@ fun EditSightingDialog(
             currentPhotoPath = tempPhotoUri.toString()
         }
     }
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(id = R.string.edit_animal)) },
+        title = { 
+            Text(text = stringResource(id = if (isNew) R.string.add_sighting else R.string.edit_animal)) 
+        },
         text = {
             Column {
-                OutlinedTextField(
-                    value = notesText,
-                    onValueChange = { notesText = it },
-                    label = { Text(stringResource(id = R.string.notes_hint)) }
-                )
-                Row(
-                    modifier = Modifier.padding(top = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = isFoundChecked,
-                        onCheckedChange = { isFoundChecked = it }
+                if (isNew) {
+                    OutlinedTextField(
+                        value = nameText,
+                        onValueChange = { nameText = it },
+                        label = { Text(stringResource(id = R.string.animal_name_hint)) },
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    Text(text = stringResource(id = R.string.checkbox_found))
-                }
-                Button(
-                    onClick = {
-                        val file = fileUtils.createImageFile()
-                        val uri = fileUtils.getUriForFile(file)
-                        tempPhotoUri = uri
-                        cameraLauncher.launch(uri)
+                } else {
+                    // Show other features only when editing an existing sighting
+                    OutlinedTextField(
+                        value = notesText,
+                        onValueChange = { notesText = it },
+                        label = { Text(stringResource(id = R.string.notes_hint)) },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Row(
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = isFoundChecked,
+                            onCheckedChange = { isFoundChecked = it }
+                        )
+                        Text(text = stringResource(id = R.string.checkbox_found))
                     }
-                ) {
-                    Text(
-                        text = if (currentPhotoPath == null) "Take Photo" else "Retake Photo"
-                    )
+                    Button(
+                        onClick = {
+                            val file = fileUtils.createImageFile()
+                            val uri = fileUtils.getUriForFile(file)
+                            tempPhotoUri = uri
+                            cameraLauncher.launch(uri)
+                        }
+                    ) {
+                        Text(
+                            text = if (currentPhotoPath == null)
+                                stringResource(id = R.string.take_photo)
+                            else
+                                stringResource(id = R.string.retake_photo)
+                        )
+                    }
                 }
             }
         },
         confirmButton = {
             Button(onClick = {
-                onSave(sighting.copy(isFound = isFoundChecked, notes = notesText,photoPath = currentPhotoPath))
+                if (nameText.isNotBlank()) {
+                    onSave(
+                        sighting.copy(
+                            name = nameText,
+                            isFound = isFoundChecked,
+                            notes = notesText,
+                            photoPath = currentPhotoPath
+                        )
+                    )
+                }
             }) {
                 Text(text = stringResource(id = R.string.save_btn))
             }

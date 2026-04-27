@@ -7,7 +7,9 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.math0490.flinders.zootreasurehunt.R
-import androidx.compose.material.icons.filled.BarChart
+
+
+//Defines Navigation routes and bottom navigation items for the app
 @Serializable
 object HomeDestination
 @Serializable

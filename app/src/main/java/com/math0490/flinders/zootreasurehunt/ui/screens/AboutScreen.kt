@@ -10,6 +10,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.math0490.flinders.zootreasurehunt.R
 import androidx.compose.ui.res.stringResource
+
+//Displays the basic functions of the app
 @Composable
 fun AboutScreen() {
     Box(

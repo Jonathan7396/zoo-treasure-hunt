@@ -24,14 +24,13 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.runtime.LaunchedEffect
-import com.math0490.flinders.zootreasurehunt.ui.components.AnimalCard
 import com.math0490.flinders.zootreasurehunt.model.Sighting
 
 enum class DragAnchors {
     START,
     END
 }
-
+//A swipeable list item that allows users to delete a sighting
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SwipeableSighting(
@@ -39,11 +38,13 @@ fun SwipeableSighting(
     onEditClick: () -> Unit,
     onSwipe: () -> Unit
 ) {
+
     val dragState = remember {
         AnchoredDraggableState(
             initialValue = DragAnchors.START
         )
     }
+    //Triggers delete when fully swiped
     LaunchedEffect(dragState.settledValue) {
         if (dragState.settledValue == DragAnchors.END) {
             onSwipe()
@@ -65,6 +66,7 @@ fun SwipeableSighting(
                 )
             }
     ) {
+        //Delete background
         Box(
             modifier = Modifier
                 .matchParentSize()

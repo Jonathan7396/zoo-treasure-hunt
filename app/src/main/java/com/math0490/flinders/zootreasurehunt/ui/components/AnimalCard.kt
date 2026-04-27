@@ -30,23 +30,26 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.scale
 
-fun getAnimalNameRes(name: String): Int {
+// Helper function to get the correct string resource ID for the animal name
+fun getAnimalNameRes(name: String): Int? {
     return when (name) {
         "Lion" -> R.string.animal_lion
         "Red Panda" -> R.string.animal_red_panda
         "Kangaroo" -> R.string.animal_kangaroo
         "Giraffe" -> R.string.animal_giraffe
         "Penguin" -> R.string.animal_penguin
-        else -> R.string.app_name
+        else -> null
     }
 }
+// Displays a single sighting card with image, details and a visual feedback along with a found label when an animal is marked as found
 @Composable
 fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
+   // Adds a colour when animal is marked as found
     val cardColor by animateColorAsState(
         targetValue = if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
         label = "cardColorAnimation"
     )
-
+    // Adds a scale animation when the animal is marked as found
     val cardScale by animateFloatAsState(
         targetValue = if (sighting.isFound) 1.02f else 1f,
         label = "cardScaleAnimation"
@@ -68,7 +71,9 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
         ) {
             AsyncImage(
                 model = imageModel,
-                contentDescription = stringResource(getAnimalNameRes(sighting.name)),
+                contentDescription = getAnimalNameRes(sighting.name)?.let {
+                    stringResource(it)
+                } ?: sighting.name,
                 modifier = Modifier
                     .size(64.dp)
                     .padding(end = 8.dp)
@@ -76,7 +81,9 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(getAnimalNameRes(sighting.name)),
+                    text = getAnimalNameRes(sighting.name)?.let {
+                        stringResource(it)
+                    } ?: sighting.name,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = textColor

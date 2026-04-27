@@ -26,4 +26,8 @@
         <string name="animal_kangaroo">कंगारू</string>
         <string name="animal_giraffe">जिराफ़</string>
         <string name="animal_penguin">पेंगुइन</string>
+        <string name="add_sighting">दर्शन जोड़ें</string>
+        <string name="animal_name_hint">जानवर का नाम</string>
+        <string name="take_photo">फोटो लें</string>
+        <string name="retake_photo">फिर से फोटो लें</string>
 </resources>

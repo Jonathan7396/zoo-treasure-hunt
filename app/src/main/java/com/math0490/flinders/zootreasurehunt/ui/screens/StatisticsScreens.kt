@@ -3,20 +3,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-
 import androidx.compose.runtime.Composable
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-
 import com.math0490.flinders.zootreasurehunt.R
 import com.math0490.flinders.zootreasurehunt.model.Sighting
+
+//Displays summary statistics of the sightings which includes total,found, remaining animals and the completion percentage
 @Composable
 fun StatisticsScreen(sightings: List<Sighting>) {
+    //Calculates key statistics for the list of sightings
     val total = sightings.size
     val found = sightings.count { it.isFound }
     val remaining = total - found

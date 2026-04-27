@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
+//File based implementation of the sighting repository.
 class FileSightingRepository(private val context: Context): SightingRepository {
 
     private val fileName = "sightings.json"
@@ -21,6 +22,7 @@ class FileSightingRepository(private val context: Context): SightingRepository {
         }
     }
 
+    //Default data used when no file exists
     private fun getDefaultSightings(): List<Sighting> {
         return listOf(
             Sighting(
@@ -46,6 +48,7 @@ class FileSightingRepository(private val context: Context): SightingRepository {
         )
     }
 
+    //Loads sightings from file or creates default sightings if file does not exist
     override suspend fun loadSightings(): List<Sighting> {
         return withContext(Dispatchers.IO) {
             val file = File(context.filesDir, fileName)
@@ -64,27 +67,30 @@ class FileSightingRepository(private val context: Context): SightingRepository {
         }
     }
 
+    // Adds a new sighting to the list
     override suspend fun addSighting(sighting: Sighting) {
         val currentList = loadSightings().toMutableList()
         currentList.add(sighting)
         saveSightings(currentList)
     }
 
+    //Updates an existing sighting based on the ID
     override suspend fun updateSighting(sighting: Sighting) {
         val currentList = loadSightings().map {
             if (it.id == sighting.id) sighting else it
         }
         saveSightings(currentList)
     }
-
+    //Removes a sighting from the list
     override suspend fun deleteSighting(sighting: Sighting) {
         val currentList = loadSightings().filter { it.id != sighting.id }
         saveSightings(currentList)
     }
+    //Returns sightings sorted by name
     override suspend fun getSortedByName(): List<Sighting> {
         return loadSightings().sortedBy { it.name }
     }
-
+    //Returns sightings sorted by found status
     override suspend fun getSortedByFound(): List<Sighting> {
         return loadSightings().sortedByDescending { it.isFound }
     }

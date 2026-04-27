@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
+// Handles storing and retrieving user preferences such as sort order using DataStore.
 class SettingsRepository(private val context: Context) {
 
     companion object {
@@ -23,6 +24,7 @@ class SettingsRepository(private val context: Context) {
             preferences[SORT_BY_NAME] ?: true
         }
 
+    // Saves the user's selected sort preference persistently.
     suspend fun setSortByName(isSortByName: Boolean) {
         context.dataStore.edit {
             it[SORT_BY_NAME] = isSortByName

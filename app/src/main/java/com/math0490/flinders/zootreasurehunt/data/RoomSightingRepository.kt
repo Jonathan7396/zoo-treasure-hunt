@@ -1,14 +1,14 @@
 package com.math0490.flinders.zootreasurehunt.data
 
-
-import android.util.Log
 import com.math0490.flinders.zootreasurehunt.model.Sighting
 import com.math0490.flinders.zootreasurehunt.model.SightingEntity
 
+//Room based implementation of the sighting repository
 class RoomSightingRepository(
     private val dao: SightingDao
 ) : SightingRepository {
 
+    //Loads sightings from the database or creates default sightings if the database is empty
     override suspend fun loadSightings(): List<Sighting> {
         val current = dao.getAll()
 
@@ -32,7 +32,7 @@ class RoomSightingRepository(
     override suspend fun addSighting(sighting: Sighting) {
         dao.insert(sighting.toEntity())
     }
-
+    //Updates an existing sighting in the database
     override suspend fun updateSighting(sighting: Sighting) {
 
         dao.update(sighting.toEntity())
@@ -41,13 +41,16 @@ class RoomSightingRepository(
     override suspend fun deleteSighting(sighting: Sighting) {
         dao.delete(sighting.toEntity())
     }
+    //Retrieves sightings sorted by name using a database query
     override suspend fun getSortedByName(): List<Sighting> {
         return dao.getSortedByName().map { it.toSighting() }
     }
-
+    //Retrieves sightings sorted by found status using a database query
     override suspend fun getSortedByFound(): List<Sighting> {
         return dao.getSortedByFound().map { it.toSighting() }
     }
+
+    //Provides default sightings for the app when the database is empty
     private fun getDefaultSightings(): List<Sighting> {
         return listOf(
             Sighting(
@@ -73,6 +76,7 @@ class RoomSightingRepository(
         )
     }
 }
+//Converts a database entity into a domain model object
 private fun SightingEntity.toSighting(): Sighting {
     return Sighting(
         id = id,
@@ -84,7 +88,7 @@ private fun SightingEntity.toSighting(): Sighting {
         timestamp = timestamp
     )
 }
-
+// Converts a domain model object into a database entity
 private fun Sighting.toEntity(): SightingEntity {
     return SightingEntity(
         id = id,

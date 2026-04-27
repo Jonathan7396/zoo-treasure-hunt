@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.math0490.flinders.zootreasurehunt.R
+
+//Displays the sorting screen allowing the user to change the sorting order of the sighting preferences
 @Composable
 fun SettingsScreen(
     isSortByName: Boolean,

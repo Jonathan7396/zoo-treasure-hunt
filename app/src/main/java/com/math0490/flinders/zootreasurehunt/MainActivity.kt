@@ -62,6 +62,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3Api
 
+//Defines the navigation routes for the app
 sealed class Screen(val route: String, @StringRes val titleRes: Int) {
     object Home : Screen("home", R.string.home)
     object Statistics : Screen("statistics", R.string.statistics)
@@ -69,6 +70,7 @@ sealed class Screen(val route: String, @StringRes val titleRes: Int) {
     object About : Screen("about", R.string.about)
 }
 
+//Main Entry point that initializes the db, repos and the UI
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +90,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+//Root Composable that manages navigation, drawer state, and UI State
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ZooApp(
@@ -139,7 +142,7 @@ fun ZooApp(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-
+    // Provides a secondary navigation through a side drawer
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -195,6 +198,7 @@ fun ZooApp(
                 )
             },
             bottomBar = {
+                // Provides a primary navigation bar with bottom items
                 NavigationBar {
                     bottomItems.forEach { item ->
                         val isSelected = currentDestination?.hasRoute(item.route::class) == true
@@ -235,6 +239,11 @@ fun ZooApp(
                         },
                         onDelete = { animal ->
                             viewModel.deleteSighting(animal)
+                        },
+                        onAddClick = {
+                            viewModel.selectSightingForEdit(
+                                Sighting(name = "")
+                            )
                         }
                     )
                 }
@@ -261,6 +270,7 @@ fun ZooApp(
                 uiState.selectedSighting?.let { sighting ->
                     EditSightingDialog(
                         sighting = sighting,
+                        isNew = uiState.sightings.none { it.id == sighting.id },
                         onDismiss = { viewModel.dismissDialog() },
                         onSave = { updated ->
                             viewModel.updateSighting(updated)
