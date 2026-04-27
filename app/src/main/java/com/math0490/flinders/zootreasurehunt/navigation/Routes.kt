@@ -7,11 +7,13 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.math0490.flinders.zootreasurehunt.R
+import androidx.compose.material.icons.filled.BarChart
 @Serializable
 object HomeDestination
 @Serializable
+object StatisticsDestination
+@Serializable
 object SettingsDestination{
-
 }
 @Serializable
 object AboutDestination
@@ -27,6 +29,7 @@ sealed class BottomNavItem(
         Icons.Default.Home,
         HomeDestination
     )
+
 
     data object Settings: BottomNavItem(
         R.string.settings,

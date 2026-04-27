@@ -14,4 +14,14 @@
     <string name="sort_by_name">Sort by name</string>
     <string name="sort_by_found">Sort by Recency/Found Status</string>
     <string name="about_text">Zoo Hunt\nCreated by\nJonathan Ninan Mathew</string>
+    <string name="statistics">Statistics</string>
+    <string name="total_animals">Total animals: %1$d</string>
+    <string name="found_animals">Found animals: %1$d</string>
+    <string name="remaining_animals">Remaining animals: %1$d</string>
+    <string name="completion_percentage">Completion: %1$d%%</string>
+    <string name="animal_lion">Lion</string>
+    <string name="animal_red_panda">Red Panda</string>
+    <string name="animal_kangaroo">Kangaroo</string>
+    <string name="animal_giraffe">Giraffe</string>
+    <string name="animal_penguin">Penguin</string>
 </resources>

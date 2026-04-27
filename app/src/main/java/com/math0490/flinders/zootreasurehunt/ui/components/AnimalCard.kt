@@ -22,10 +22,35 @@ import com.math0490.flinders.zootreasurehunt.R
 import com.math0490.flinders.zootreasurehunt.model.Sighting
 import java.text.DateFormat
 import java.util.Date
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.scale
 
+fun getAnimalNameRes(name: String): Int {
+    return when (name) {
+        "Lion" -> R.string.animal_lion
+        "Red Panda" -> R.string.animal_red_panda
+        "Kangaroo" -> R.string.animal_kangaroo
+        "Giraffe" -> R.string.animal_giraffe
+        "Penguin" -> R.string.animal_penguin
+        else -> R.string.app_name
+    }
+}
 @Composable
 fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
-    val cardColor = if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5)
+    val cardColor by animateColorAsState(
+        targetValue = if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
+        label = "cardColorAnimation"
+    )
+
+    val cardScale by animateFloatAsState(
+        targetValue = if (sighting.isFound) 1.02f else 1f,
+        label = "cardScaleAnimation"
+    )
     val textColor = if (sighting.isFound) Color(0xFF2E7D32) else Color.Black
     val imageModel = sighting.photoPath ?: "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
     val formattedTime = DateFormat.getDateTimeInstance().format(Date(sighting.timestamp))
@@ -33,6 +58,7 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .scale(cardScale)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
@@ -42,7 +68,7 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
         ) {
             AsyncImage(
                 model = imageModel,
-                contentDescription = sighting.name,
+                contentDescription = stringResource(getAnimalNameRes(sighting.name)),
                 modifier = Modifier
                     .size(64.dp)
                     .padding(end = 8.dp)
@@ -50,13 +76,13 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = sighting.name,
+                    text = stringResource(getAnimalNameRes(sighting.name)),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = textColor
                 )
 
-                if (sighting.isFound && sighting.notes.isNotEmpty()) {
+                if (sighting.notes.isNotEmpty()) {
                     Text(
                         text = sighting.notes,
                         fontSize = 14.sp,
@@ -70,7 +96,10 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
                 )
             }
 
-            if (sighting.isFound) {
+            AnimatedVisibility(
+                visible = sighting.isFound,
+                enter = fadeIn() + scaleIn()
+            ) {
                 Text(
                     text = stringResource(R.string.found_label),
                     fontWeight = FontWeight.Bold,

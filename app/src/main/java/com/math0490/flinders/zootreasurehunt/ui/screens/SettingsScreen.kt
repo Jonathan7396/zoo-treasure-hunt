@@ -10,16 +10,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import com.math0490.flinders.zootreasurehunt.R
 @Composable
 fun SettingsScreen(
     isSortByName: Boolean,
     onSortChange: (Boolean) -> Unit
 ) {
-    Column {
+    Column (modifier = Modifier.padding(16.dp)){
 
         Text(stringResource(R.string.settings_title), fontSize = 28.sp)
-        Text(stringResource(R.string.sort_order), modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+        Text(stringResource(R.string.sort_order), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
 
         Row {
             RadioButton(

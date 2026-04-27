@@ -16,4 +16,14 @@
         <string name="sort_by_name">नाम के अनुसार</string>
         <string name="sort_by_found">हाल/स्थिति के अनुसार</string>
         <string name="about_text">ज़ू हंट\nनिर्माता\nजोनाथन निनान मैथ्यू</string>
+        <string name="statistics">आंकड़े</string>
+        <string name="total_animals">कुल जानवर: %1$d</string>
+        <string name="found_animals">मिले हुए जानवर: %1$d</string>
+        <string name="remaining_animals">बाकी जानवर: %1$d</string>
+        <string name="completion_percentage">पूर्णता: %1$d%%</string>
+        <string name="animal_lion">शेर</string>
+        <string name="animal_red_panda">लाल पांडा</string>
+        <string name="animal_kangaroo">कंगारू</string>
+        <string name="animal_giraffe">जिराफ़</string>
+        <string name="animal_penguin">पेंगुइन</string>
 </resources>
