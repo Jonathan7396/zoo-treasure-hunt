@@ -12,7 +12,9 @@ data class SightingEntity(
     val photoPath: String?,
     val isFound: Boolean,
     val notes: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )
 
 

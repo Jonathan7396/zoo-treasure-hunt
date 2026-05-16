@@ -55,7 +55,7 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
         label = "cardScaleAnimation"
     )
     val textColor = if (sighting.isFound) Color(0xFF2E7D32) else Color.Black
-    val imageModel = sighting.photoPath ?: "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
+    val imageModel = sighting.photoPath ?: sighting.imageUrl
     val formattedTime = DateFormat.getDateTimeInstance().format(Date(sighting.timestamp))
 
     Card(

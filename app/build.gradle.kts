@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.hilt.android)
+    implementation(libs.play.services.location)
     ksp(libs.hilt.android.compiler)
 
 }

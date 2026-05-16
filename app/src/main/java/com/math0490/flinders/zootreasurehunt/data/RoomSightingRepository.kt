@@ -54,27 +54,38 @@ class RoomSightingRepository @Inject constructor(
     }
 
     // Provides default sightings for the app when the database is empty
+    // Provides default sightings for the app when the database is empty
     private fun getDefaultSightings(): List<Sighting> {
         return listOf(
             Sighting(
                 name = "Lion",
-                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg"
+                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg",
+                latitude = -34.9126,
+                longitude = 138.6062
             ),
             Sighting(
                 name = "Red Panda",
-                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/red-panda-ai.jpg"
+                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/red-panda-ai.jpg",
+                latitude = -34.9128,
+                longitude = 138.6065
             ),
             Sighting(
                 name = "Giraffe",
-                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/giraffe-ai.jpg"
+                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/giraffe-ai.jpg",
+                latitude = -34.9130,
+                longitude = 138.6068
             ),
             Sighting(
                 name = "Kangaroo",
-                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/red-kangaroo-ai.jpg"
+                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/red-kangaroo-ai.jpg",
+                latitude = -34.9132,
+                longitude = 138.6070
             ),
             Sighting(
                 name = "Penguin",
-                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/penguin-ai.jpg"
+                imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/penguin-ai.jpg",
+                latitude = -34.9134,
+                longitude = 138.6072
             )
         )
     }
@@ -89,7 +100,9 @@ fun SightingEntity.toSighting(): Sighting {
         notes = notes,
         imageUrl = imageUrl,
         photoPath = photoPath,
-        timestamp = timestamp
+        timestamp = timestamp,
+        latitude = latitude,
+        longitude = longitude
     )
 }
 
@@ -102,6 +115,8 @@ fun Sighting.toEntity(): SightingEntity {
         photoPath = photoPath,
         isFound = isFound,
         notes = notes,
-        timestamp = timestamp
+        timestamp = timestamp,
+        latitude = latitude,
+        longitude = longitude
     )
 }

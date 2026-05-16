@@ -8,7 +8,7 @@ import com.math0490.flinders.zootreasurehunt.model.SightingEntity
 
 @Database(
     entities = [SightingEntity::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 abstract class ZooDatabase : RoomDatabase() {
