@@ -1,6 +1,5 @@
 package com.math0490.flinders.zootreasurehunt
 
-import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,20 +30,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.math0490.flinders.zootreasurehunt.data.RoomSightingRepository
-import com.math0490.flinders.zootreasurehunt.data.SettingsRepository
-import com.math0490.flinders.zootreasurehunt.data.ZooDatabase
 import com.math0490.flinders.zootreasurehunt.model.Sighting
 import com.math0490.flinders.zootreasurehunt.navigation.AboutDestination
 import com.math0490.flinders.zootreasurehunt.navigation.BottomNavItem
@@ -58,12 +53,10 @@ import com.math0490.flinders.zootreasurehunt.ui.screens.SettingsScreen
 import com.math0490.flinders.zootreasurehunt.ui.screens.StatisticsScreen
 import com.math0490.flinders.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
 import com.math0490.flinders.zootreasurehunt.viewmodel.ZooViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import androidx.compose.ui.unit.dp
-import androidx.compose.material3.ExperimentalMaterial3Api
 
-
-//Defines the navigation routes for the app
+// Defines the navigation routes for the app
 sealed class Screen(val route: String, @StringRes val titleRes: Int) {
     object Home : Screen("home", R.string.home)
     object Statistics : Screen("statistics", R.string.statistics)
@@ -71,50 +64,30 @@ sealed class Screen(val route: String, @StringRes val titleRes: Int) {
     object About : Screen("about", R.string.about)
 }
 
-//Main class that initializes the db, repos and the UI
+// Main class that initializes the UI
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val database = ZooDatabase.getDatabase(this)
-        val repository = RoomSightingRepository(database.sightingDao())
-        val settingsRepository = SettingsRepository(this)
-
         setContent {
             MaterialTheme {
-                ZooApp(
-                    repository = repository,
-                    settingsRepository = settingsRepository
-                )
+                ZooApp()
             }
         }
     }
 }
+
 // Composable that manages navigation, drawer state, and UI State
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ZooApp(
-    repository: RoomSightingRepository,
-    settingsRepository: SettingsRepository
-) {
+fun ZooApp() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
-    val viewModel: ZooViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ZooViewModel(
-                    repository = repository,
-                    settingsRepository = settingsRepository,
-                    application = context.applicationContext as Application
-                ) as T
-            }
-        }
-    )
-
+    val viewModel: ZooViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -143,6 +116,7 @@ fun ZooApp(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
     // Provides a secondary navigation through a side drawer
     ModalNavigationDrawer(
         drawerState = drawerState,

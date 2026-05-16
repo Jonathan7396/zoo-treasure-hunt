@@ -17,12 +17,16 @@ import com.math0490.flinders.zootreasurehunt.data.SettingsRepository
 import com.math0490.flinders.zootreasurehunt.model.ZooUiState
 import kotlinx.coroutines.flow.asStateFlow
 import android.util.Log
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 // ZooView Model is responsible for managing the sighting data, user preferences and coordinating all the  database operations within the UI
-class ZooViewModel(
+@HiltViewModel
+class ZooViewModel @Inject constructor(
     private val repository: SightingRepository,
     private val settingsRepository: SettingsRepository,
-    application: Application) : AndroidViewModel(application) {
+    application: Application
+) : AndroidViewModel(application) {
 
     private val TAG = "ZooViewModel"
     private val workManager = WorkManager.getInstance(application)

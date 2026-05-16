@@ -6,9 +6,13 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 //File based implementation of the sighting repository.
-class FileSightingRepository(private val context: Context): SightingRepository {
+class FileSightingRepository @Inject constructor(
+    @ApplicationContext private val context: Context
+) : SightingRepository {
 
     private val fileName = "sightings.json"
 
