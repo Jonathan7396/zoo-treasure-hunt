@@ -11,10 +11,14 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,13 +31,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import kotlin.math.abs
 import kotlin.math.sqrt
-import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun StepCounterCard() {
@@ -71,6 +74,7 @@ fun StepCounterCard() {
 
     val usingStepCounter = stepSensor != null && hasPermission
     val usingAccelerometerFallback = stepSensor == null && accelerometer != null
+    val badgeInfo = getSafariBadgeInfo(safariSteps)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -159,88 +163,87 @@ fun StepCounterCard() {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Safari Movement Tracker",
+                text = "Safari Explorer Progress",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
             when {
                 stepSensor != null && !hasPermission -> {
                     Text(
-                        text = "Activity recognition permission is needed to track safari steps.",
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = "Allow step tracking to unlock safari explorer badges.",
+                        style = MaterialTheme.typography.bodyMedium
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Button(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 permissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
                             }
-                        },
-                        modifier = Modifier.padding(top = 8.dp)
+                        }
                     ) {
                         Text(text = "Allow Step Tracking")
                     }
                 }
 
-                usingStepCounter -> {
+                usingStepCounter || usingAccelerometerFallback -> {
                     Text(
-                        text = "Sensor mode: Hardware step counter",
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = "Movement steps: $safariSteps",
+                        style = MaterialTheme.typography.bodyMedium
                     )
 
-                    Text(
-                        text = "Steps walked: $safariSteps",
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Badge: ${getSafariBadge(safariSteps)}",
-                        modifier = Modifier.padding(top = 4.dp)
+                        text = "Current badge: ${badgeInfo.currentBadge}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
 
-                    ResetStepsButton(
-                        onReset = {
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = badgeInfo.nextBadgeText,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LinearProgressIndicator(
+                        progress = { badgeInfo.progress },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
                             if (currentRawSteps >= 0) {
                                 sharedPreferences.edit()
                                     .putInt("step_baseline", currentRawSteps)
                                     .putInt("safari_steps", 0)
                                     .apply()
-                                safariSteps = 0
+                            } else {
+                                sharedPreferences.edit()
+                                    .putInt("safari_steps", 0)
+                                    .apply()
                             }
-                        }
-                    )
-                }
 
-                usingAccelerometerFallback -> {
-
-
-                    Text(
-                        text = "Movement steps: $safariSteps",
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-
-                    Text(
-                        text = "Badge: ${getSafariBadge(safariSteps)}",
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-
-
-
-                    ResetStepsButton(
-                        onReset = {
-                            sharedPreferences.edit()
-                                .putInt("safari_steps", 0)
-                                .apply()
                             safariSteps = 0
                         }
-                    )
+                    ) {
+                        Text(text = "Reset Safari Steps")
+                    }
                 }
 
                 else -> {
                     Text(
-                        text = "No step counter or accelerometer sensor is available on this device.",
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = "Movement tracking is not available on this device.",
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -248,15 +251,11 @@ fun StepCounterCard() {
     }
 }
 
-@Composable
-private fun ResetStepsButton(onReset: () -> Unit) {
-    Button(
-        onClick = onReset,
-        modifier = Modifier.padding(top = 8.dp)
-    ) {
-        Text(text = "Reset Safari Steps")
-    }
-}
+private data class SafariBadgeInfo(
+    val currentBadge: String,
+    val nextBadgeText: String,
+    val progress: Float
+)
 
 private fun hasActivityRecognitionPermission(context: Context): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -269,11 +268,30 @@ private fun hasActivityRecognitionPermission(context: Context): Boolean {
     }
 }
 
-private fun getSafariBadge(steps: Int): String {
+private fun getSafariBadgeInfo(steps: Int): SafariBadgeInfo {
     return when {
-        steps >= 1000 -> "Zoo Champion"
-        steps >= 500 -> "Safari Tracker"
-        steps >= 100 -> "Junior Explorer"
-        else -> "New Explorer"
+        steps >= 1000 -> SafariBadgeInfo(
+            currentBadge = "Zoo Champion",
+            nextBadgeText = "Highest badge unlocked!",
+            progress = 1f
+        )
+
+        steps >= 500 -> SafariBadgeInfo(
+            currentBadge = "Safari Tracker",
+            nextBadgeText = "Next badge: Zoo Champion at 1000 steps",
+            progress = ((steps - 500).toFloat() / 500f).coerceIn(0f, 1f)
+        )
+
+        steps >= 100 -> SafariBadgeInfo(
+            currentBadge = "Junior Explorer",
+            nextBadgeText = "Next badge: Safari Tracker at 500 steps",
+            progress = ((steps - 100).toFloat() / 400f).coerceIn(0f, 1f)
+        )
+
+        else -> SafariBadgeInfo(
+            currentBadge = "New Explorer",
+            nextBadgeText = "Next badge: Junior Explorer at 100 steps",
+            progress = (steps.toFloat() / 100f).coerceIn(0f, 1f)
+        )
     }
 }

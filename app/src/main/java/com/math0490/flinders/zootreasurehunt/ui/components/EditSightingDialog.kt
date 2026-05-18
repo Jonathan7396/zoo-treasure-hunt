@@ -36,6 +36,8 @@ fun EditSightingDialog(
     onSave: (Sighting) -> Unit
 ) {
     var nameText by remember { mutableStateOf(sighting.name) }
+    var latText by remember { mutableStateOf(if (isNew) "" else sighting.latitude.toString()) }
+    var lngText by remember { mutableStateOf(if (isNew) "" else sighting.longitude.toString()) }
     var notesText by remember { mutableStateOf(sighting.notes) }
     var isFoundChecked by remember { mutableStateOf(sighting.isFound) }
 
@@ -114,6 +116,18 @@ fun EditSightingDialog(
                         label = { Text(stringResource(id = R.string.animal_name_hint)) },
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
+                    OutlinedTextField(
+                        value = latText,
+                        onValueChange = { latText = it },
+                        label = { Text(stringResource(id = R.string.latitude_hint)) },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    OutlinedTextField(
+                        value = lngText,
+                        onValueChange = { lngText = it },
+                        label = { Text(stringResource(id = R.string.longitude_hint)) },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
                 } else {
                     OutlinedTextField(
                         value = notesText,
@@ -165,6 +179,8 @@ fun EditSightingDialog(
                     onSave(
                         sighting.copy(
                             name = nameText,
+                            latitude = latText.toDoubleOrNull() ?: 0.0,
+                            longitude = lngText.toDoubleOrNull() ?: 0.0,
                             isFound = isFoundChecked,
                             notes = notesText,
                             photoPath = currentPhotoPath

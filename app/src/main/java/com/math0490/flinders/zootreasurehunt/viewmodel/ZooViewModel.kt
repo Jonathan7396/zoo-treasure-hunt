@@ -98,6 +98,29 @@ class ZooViewModel @Inject constructor(
             }
         }
     }
+    // Adds a new sighting with user-entered coordinates
+    fun addSighting(
+        name: String,
+        latitude: Double,
+        longitude: Double
+    ) {
+        viewModelScope.launch {
+            try {
+                val newSighting = Sighting(
+                    name = name.trim(),
+                    imageUrl = "https://wilk0077.github.io/comp2012-images/assets-sm/african-lion-ai.jpg",
+                    latitude = latitude,
+                    longitude = longitude,
+                    timestamp = System.currentTimeMillis()
+                )
+
+                repository.addSighting(newSighting)
+                _rawSightings.value = repository.loadSightings()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error adding sighting", e)
+            }
+        }
+    }
     //Deletes a sighting and the reloads the list
     fun deleteSighting(sighting: Sighting) {
         viewModelScope.launch {

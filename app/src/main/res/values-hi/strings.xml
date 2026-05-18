@@ -28,6 +28,8 @@
         <string name="animal_penguin">पेंगुइन</string>
         <string name="add_sighting">दर्शन जोड़ें</string>
         <string name="animal_name_hint">जानवर का नाम</string>
+        <string name="latitude_hint">अक्षांश (Latitude)</string>
+        <string name="longitude_hint">देशांतर (Longitude)</string>
         <string name="take_photo">फोटो लें</string>
         <string name="retake_photo">फिर से फोटो लें</string>
 </resources>
