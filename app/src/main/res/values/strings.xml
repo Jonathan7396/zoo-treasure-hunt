@@ -30,4 +30,5 @@
     <string name="longitude_hint">Longitude</string>
     <string name="take_photo">Take Photo</string>
     <string name="retake_photo">Retake Photo</string>
+
 </resources>
