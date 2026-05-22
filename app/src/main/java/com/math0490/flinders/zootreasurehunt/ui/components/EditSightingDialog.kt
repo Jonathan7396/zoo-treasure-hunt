@@ -75,27 +75,39 @@ fun EditSightingDialog(
             return
         }
 
-        if (isNew) {
-            // For new animals, we use the current location as the enclosure location
-            latText = currentLocation.latitude.toString()
-            lngText = currentLocation.longitude.toString()
-            feedbackMessage = "Enclosure location recorded at your current position."
-            launchCamera()
-            return
+        // Parse what the user has typed in the boxes
+        val enteredLat = latText.toDoubleOrNull()
+        val enteredLng = lngText.toDoubleOrNull()
+
+        val animalLat: Double
+        val animalLng: Double
+
+        if (isNew && (enteredLat == null || enteredLng == null)) {
+            // If it's a new animal and the user left the boxes empty, 
+            // we use the current location as the exhibit home.
+            animalLat = currentLocation.latitude
+            animalLng = currentLocation.longitude
+            latText = animalLat.toString()
+            lngText = animalLng.toString()
+            feedbackMessage = "New enclosure location set to your current position."
+        } else {
+            // Otherwise, we check against what is in the boxes (or the existing sighting)
+            animalLat = enteredLat ?: sighting.latitude
+            animalLng = enteredLng ?: sighting.longitude
         }
 
         val distance = LocationUtils.distanceBetweenMeters(
             userLatitude = currentLocation.latitude,
             userLongitude = currentLocation.longitude,
-            animalLatitude = sighting.latitude,
-            animalLongitude = sighting.longitude
+            animalLatitude = animalLat,
+            animalLongitude = animalLng
         )
 
         if (distance <= 50f) {
             feedbackMessage = "Location verified. You can capture the animal photo."
             launchCamera()
         } else {
-            feedbackMessage = "You are too far from the ${sighting.name} enclosure! Distance: ${distance.toInt()} m."
+            feedbackMessage = "You are too far! Distance: ${distance.toInt()} m. You must be within 50m of the enclosure."
         }
     }
 
