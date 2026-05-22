@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,17 +46,36 @@ fun getAnimalNameRes(name: String): Int? {
 // Displays a single sighting card with image, details and a visual feedback along with a found label when an animal is marked as found
 @Composable
 fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
+    // Check if we are currently in dark mode (Nocturnal Mode)
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+
+    // Use your preferred colors for light mode, and theme colors for dark mode
+    val targetColor = if (isDark) {
+        if (sighting.isFound) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+    } else {
+        if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5)
+    }
+
    // Adds a colour when animal is marked as found
     val cardColor by animateColorAsState(
-        targetValue = if (sighting.isFound) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
+        targetValue = targetColor,
         label = "cardColorAnimation"
     )
+    
     // Adds a scale animation when the animal is marked as found
     val cardScale by animateFloatAsState(
         targetValue = if (sighting.isFound) 1.02f else 1f,
         label = "cardScaleAnimation"
     )
-    val textColor = if (sighting.isFound) Color(0xFF2E7D32) else Color.Black
+
+    val textColor = if (isDark) {
+        if (sighting.isFound) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+    } else {
+        if (sighting.isFound) Color(0xFF2E7D32) else Color.Black
+    }
+
+    val secondaryTextColor = if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color.Gray
+
     val imageModel = sighting.photoPath ?: sighting.imageUrl
     val formattedTime = DateFormat.getDateTimeInstance().format(Date(sighting.timestamp))
 
@@ -93,13 +114,13 @@ fun AnimalCard(sighting: Sighting, onClick: () -> Unit) {
                     Text(
                         text = sighting.notes,
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = secondaryTextColor
                     )
                 }
                 Text(
                     text = formattedTime,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = secondaryTextColor
                 )
             }
 

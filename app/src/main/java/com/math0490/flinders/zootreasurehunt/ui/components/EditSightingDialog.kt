@@ -75,6 +75,15 @@ fun EditSightingDialog(
             return
         }
 
+        if (isNew) {
+            // For new animals, we use the current location as the enclosure location
+            latText = currentLocation.latitude.toString()
+            lngText = currentLocation.longitude.toString()
+            feedbackMessage = "Enclosure location recorded at your current position."
+            launchCamera()
+            return
+        }
+
         val distance = LocationUtils.distanceBetweenMeters(
             userLatitude = currentLocation.latitude,
             userLongitude = currentLocation.longitude,
@@ -144,32 +153,32 @@ fun EditSightingDialog(
                         },
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
+                }
 
-                    Button(
-                        onClick = {
-                            if (LocationUtils.hasLocationPermission(context)) {
-                                scope.launch {
-                                    checkLocationAndLaunchCamera()
-                                }
-                            } else {
-                                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                Button(
+                    onClick = {
+                        if (LocationUtils.hasLocationPermission(context)) {
+                            scope.launch {
+                                checkLocationAndLaunchCamera()
                             }
+                        } else {
+                            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                         }
-                    ) {
-                        Text(
-                            text = if (currentPhotoPath == null)
-                                stringResource(id = R.string.take_photo)
-                            else
-                                stringResource(id = R.string.retake_photo)
-                        )
                     }
+                ) {
+                    Text(
+                        text = if (currentPhotoPath == null)
+                            stringResource(id = R.string.take_photo)
+                        else
+                            stringResource(id = R.string.retake_photo)
+                    )
+                }
 
-                    feedbackMessage?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
+                feedbackMessage?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
             }
         },

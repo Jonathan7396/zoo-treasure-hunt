@@ -53,6 +53,7 @@ import com.math0490.flinders.zootreasurehunt.ui.screens.SettingsScreen
 import com.math0490.flinders.zootreasurehunt.ui.screens.StatisticsScreen
 import com.math0490.flinders.zootreasurehunt.ui.theme.ZooTreasureHuntTheme
 import com.math0490.flinders.zootreasurehunt.viewmodel.ZooViewModel
+import com.math0490.flinders.zootreasurehunt.utils.rememberNocturnalMode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -72,7 +73,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            MaterialTheme {
+            val isNocturnal = rememberNocturnalMode()
+            ZooTreasureHuntTheme(forceDark = isNocturnal) {
                 ZooApp()
             }
         }
