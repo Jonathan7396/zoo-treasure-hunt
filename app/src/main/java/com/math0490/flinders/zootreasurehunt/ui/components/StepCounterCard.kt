@@ -45,10 +45,12 @@ fun StepCounterCard() {
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
+    // Access the Hardware Step Counter as requested
     val stepSensor = remember {
         sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     }
 
+    // Fallback to Accelerometer for real-time feedback and emulator support
     val accelerometer = remember {
         sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     }
@@ -61,19 +63,14 @@ fun StepCounterCard() {
         mutableStateOf(hasActivityRecognitionPermission(context))
     }
 
-    var currentRawSteps by remember {
-        mutableIntStateOf(sharedPreferences.getInt("current_raw_steps", -1))
-    }
-
     var safariSteps by remember {
         mutableIntStateOf(sharedPreferences.getInt("safari_steps", 0))
     }
 
+    // Math states for real-time detection
     var lastMagnitude by remember { mutableFloatStateOf(0f) }
     var lastStepTime by remember { mutableLongStateOf(0L) }
 
-    val usingStepCounter = stepSensor != null && hasPermission
-    val usingAccelerometerFallback = stepSensor == null && accelerometer != null
     val badgeInfo = getSafariBadgeInfo(safariSteps)
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -83,10 +80,12 @@ fun StepCounterCard() {
     }
 
     DisposableEffect(hasPermission, stepSensor, accelerometer) {
-        val sensorToUse = when {
-            usingStepCounter -> stepSensor
-            usingAccelerometerFallback -> accelerometer
-            else -> null
+        // Choose which sensor to use based on your requirement: 
+        // Use Hardware Step Counter if available, otherwise skip and use Accelerometer.
+        val sensorToUse = if (stepSensor != null && hasPermission) {
+            stepSensor
+        } else {
+            accelerometer
         }
 
         if (sensorToUse == null) {
@@ -96,46 +95,34 @@ fun StepCounterCard() {
                 override fun onSensorChanged(event: SensorEvent?) {
                     event ?: return
 
+                    // Logic for Hardware Step Counter
                     if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                        val rawSteps = event.values.firstOrNull()?.toInt() ?: return
-                        currentRawSteps = rawSteps
-
-                        var baseline = sharedPreferences.getInt("step_baseline", -1)
-
+                        val rawSteps = event.values[0].toInt()
+                        val baseline = sharedPreferences.getInt("step_baseline", -1)
+                        
                         if (baseline == -1) {
-                            baseline = rawSteps
-                            sharedPreferences.edit()
-                                .putInt("step_baseline", baseline)
-                                .apply()
+                            sharedPreferences.edit().putInt("step_baseline", rawSteps).apply()
+                        } else {
+                            val sessionSteps = (rawSteps - baseline).coerceAtLeast(0)
+                            safariSteps = sessionSteps
+                            sharedPreferences.edit().putInt("safari_steps", safariSteps).apply()
                         }
-
-                        val calculatedSteps = (rawSteps - baseline).coerceAtLeast(0)
-                        safariSteps = calculatedSteps
-
-                        sharedPreferences.edit()
-                            .putInt("current_raw_steps", rawSteps)
-                            .putInt("safari_steps", calculatedSteps)
-                            .apply()
                     }
 
+                    // Logic for Accelerometer (Used only if step counter is skipped)
                     if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
                         val x = event.values[0]
                         val y = event.values[1]
                         val z = event.values[2]
-
                         val magnitude = sqrt(x * x + y * y + z * z)
-                        val movementChange = abs(magnitude - lastMagnitude)
+                        val delta = abs(magnitude - lastMagnitude)
                         val now = System.currentTimeMillis()
 
-                        if (movementChange > 2.0f && now - lastStepTime > 250L) {
+                        if (delta > 2.0f && now - lastStepTime > 250L) {
                             safariSteps += 1
                             lastStepTime = now
-
-                            sharedPreferences.edit()
-                                .putInt("safari_steps", safariSteps)
-                                .apply()
+                            sharedPreferences.edit().putInt("safari_steps", safariSteps).apply()
                         }
-
                         lastMagnitude = magnitude
                     }
                 }
@@ -143,11 +130,7 @@ fun StepCounterCard() {
                 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
             }
 
-            sensorManager.registerListener(
-                listener,
-                sensorToUse,
-                SensorManager.SENSOR_DELAY_UI
-            )
+            sensorManager.registerListener(listener, sensorToUse, SensorManager.SENSOR_DELAY_UI)
 
             onDispose {
                 sensorManager.unregisterListener(listener)
@@ -170,81 +153,58 @@ fun StepCounterCard() {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            when {
-                stepSensor != null && !hasPermission -> {
-                    Text(
-                        text = "Allow step tracking to unlock safari explorer badges.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        onClick = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                permissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-                            }
-                        }
-                    ) {
-                        Text(text = "Allow Step Tracking")
+            if (stepSensor != null && !hasPermission) {
+                Text(
+                    text = "Permission required to access hardware step counter.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Button(onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        permissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
                     }
+                }) {
+                    Text("Grant Permission")
                 }
+            } else {
+                Text(
+                    text = "Safari steps: $safariSteps",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-                usingStepCounter || usingAccelerometerFallback -> {
-                    Text(
-                        text = "Movement steps: $safariSteps",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                Spacer(modifier = Modifier.height(4.dp))
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Current badge: ${badgeInfo.currentBadge}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
 
-                    Text(
-                        text = "Current badge: ${badgeInfo.currentBadge}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = badgeInfo.nextBadgeText,
+                    style = MaterialTheme.typography.bodySmall
+                )
 
-                    Text(
-                        text = badgeInfo.nextBadgeText,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    progress = { badgeInfo.progress },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                    LinearProgressIndicator(
-                        progress = { badgeInfo.progress },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            if (currentRawSteps >= 0) {
-                                sharedPreferences.edit()
-                                    .putInt("step_baseline", currentRawSteps)
-                                    .putInt("safari_steps", 0)
-                                    .apply()
-                            } else {
-                                sharedPreferences.edit()
-                                    .putInt("safari_steps", 0)
-                                    .apply()
-                            }
-
-                            safariSteps = 0
-                        }
-                    ) {
-                        Text(text = "Reset Safari Steps")
+                Button(
+                    onClick = {
+                        safariSteps = 0
+                        sharedPreferences.edit()
+                            .putInt("safari_steps", 0)
+                            .putInt("step_baseline", -1)
+                            .apply()
                     }
-                }
-
-                else -> {
-                    Text(
-                        text = "Movement tracking is not available on this device.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                ) {
+                    Text(text = "Reset Safari Steps")
                 }
             }
         }

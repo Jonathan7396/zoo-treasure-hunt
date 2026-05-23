@@ -6,8 +6,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -149,6 +155,32 @@ fun EditSightingDialog(
                         label = { Text(stringResource(id = R.string.longitude_hint)) },
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
+
+                    TextButton(
+                        onClick = {
+                            if (LocationUtils.hasLocationPermission(context)) {
+                                scope.launch {
+                                    val loc = LocationUtils.getCurrentLocation(context)
+                                    if (loc != null) {
+                                        latText = loc.latitude.toString()
+                                        lngText = loc.longitude.toString()
+                                        feedbackMessage = "Coordinates set to current position."
+                                    } else {
+                                        feedbackMessage = "Unable to fetch location."
+                                    }
+                                }
+                            } else {
+                                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            }
+                        },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Icon(Icons.Default.LocationOn, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Use Current Location")
+                        }
+                    }
                 } else {
                     OutlinedTextField(
                         value = notesText,
