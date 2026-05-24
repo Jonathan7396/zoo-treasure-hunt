@@ -130,14 +130,17 @@ fun StepCounterCard() {
                             val z = event.values[2]
 
                             val magnitude = sqrt(x * x + y * y + z * z)
-                            val movementChange = abs(magnitude - lastMagnitude)
                             val now = System.currentTimeMillis()
 
-                            /*
-                             * Approximate fallback only.
-                             * A large movement change, spaced apart by 250ms,
-                             * is treated as one movement step.
-                             */
+                            // First accelerometer reading is only used as a starting point.
+                            // Do not count it as a step.
+                            if (lastMagnitude == 0f) {
+                                lastMagnitude = magnitude
+                                return
+                            }
+
+                            val movementChange = abs(magnitude - lastMagnitude)
+
                             if (movementChange > 2.0f && now - lastStepTime > 250L) {
                                 safariSteps += 1
                                 lastStepTime = now
