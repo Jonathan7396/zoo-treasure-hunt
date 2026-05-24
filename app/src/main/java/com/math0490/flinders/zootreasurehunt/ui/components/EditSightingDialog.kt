@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
 import com.math0490.flinders.zootreasurehunt.R
 import com.math0490.flinders.zootreasurehunt.model.Sighting
 import com.math0490.flinders.zootreasurehunt.utils.FileUtils
@@ -66,11 +68,34 @@ fun EditSightingDialog(
         }
     }
 
-    fun launchCamera() {
-        val file = fileUtils.createImageFile()
-        val uri = fileUtils.getUriForFile(file)
-        tempPhotoUri = uri
-        cameraLauncher.launch(uri)
+    // Permission launcher for Camera
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            val file = fileUtils.createImageFile()
+            val uri = fileUtils.getUriForFile(file)
+            tempPhotoUri = uri
+            cameraLauncher.launch(uri)
+        } else {
+            feedbackMessage = "Camera permission is required to capture a photo."
+        }
+    }
+
+    fun launchCameraWithPermissionCheck() {
+        val hasCameraPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasCameraPermission) {
+            val file = fileUtils.createImageFile()
+            val uri = fileUtils.getUriForFile(file)
+            tempPhotoUri = uri
+            cameraLauncher.launch(uri)
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
     }
 
     suspend fun checkLocationAndLaunchCamera() {
@@ -111,7 +136,7 @@ fun EditSightingDialog(
 
         if (distance <= 50f) {
             feedbackMessage = "Location verified. You can capture the animal photo."
-            launchCamera()
+            launchCameraWithPermissionCheck()
         } else {
             feedbackMessage = "You are too far! Distance: ${distance.toInt()} m. You must be within 50m of the enclosure."
         }
