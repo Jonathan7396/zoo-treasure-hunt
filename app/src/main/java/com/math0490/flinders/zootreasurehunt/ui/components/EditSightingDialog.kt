@@ -122,7 +122,7 @@ fun EditSightingDialog(
             lngText = animalLng.toString()
             feedbackMessage = "New enclosure location set to your current position."
         } else {
-            // Otherwise, we check against what is in the boxes (or the existing sighting)
+
             animalLat = enteredLat ?: sighting.latitude
             animalLng = enteredLng ?: sighting.longitude
         }

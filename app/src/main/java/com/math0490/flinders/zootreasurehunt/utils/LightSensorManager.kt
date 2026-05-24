@@ -19,7 +19,7 @@ class LightSensorManager(context: Context) {
     private val _isLowLight = mutableStateOf(false)
     val isLowLight: State<Boolean> = _isLowLight
 
-    // Threshold for nocturnal house (typical dark room is < 10-20 lux)
+    // Threshold for nocturnal
     private val NOCTURNAL_THRESHOLD = 10f
 
     private val lightListener = object : SensorEventListener {
