@@ -203,7 +203,7 @@ fun EditSightingDialog(
                         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                             Icon(Icons.Default.LocationOn, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text("Use Current Location")
+                            Text(stringResource(R.string.use_current_location))
                         }
                     }
                 } else {

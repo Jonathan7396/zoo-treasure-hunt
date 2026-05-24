@@ -41,7 +41,7 @@ fun StatisticsScreen(sightings: List<Sighting>) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Treasure Hunt Progress",
+            text = stringResource(R.string.treasure_hunt_progress),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )

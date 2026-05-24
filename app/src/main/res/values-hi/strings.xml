@@ -28,8 +28,8 @@
         <string name="animal_penguin">पेंगुइन</string>
         <string name="add_sighting">दर्शन जोड़ें</string>
         <string name="animal_name_hint">जानवर का नाम</string>
-        <string name="latitude_hint">अक्षांश (Latitude)</string>
-        <string name="longitude_hint">देशांतर (Longitude)</string>
+        <string name="latitude_hint">अक्षांश</string>
+        <string name="longitude_hint">देशांतर</string>
         <string name="take_photo">फोटो लें</string>
         <string name="retake_photo">फिर से फोटो लें</string>
         <string name="safari_progress_title">सफ़ारी एक्सप्लोरर प्रगति</string>
@@ -42,4 +42,6 @@
         <string name="badge_zoo_champion">चिड़ियाघर चैंपियन</string>
         <string name="next_badge_info">अगला बैज: %2$d कदमों पर %1$s</string>
         <string name="highest_badge_unlocked">उच्चतम बैज अनलॉक हो गया!</string>
+        <string name="treasure_hunt_progress">खजाने की खोज की प्रगति</string>
+        <string name="use_current_location">वर्तमान स्थान का उपयोग करें</string>
 </resources>

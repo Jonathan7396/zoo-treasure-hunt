@@ -40,4 +40,6 @@
     <string name="badge_zoo_champion">Zoo Champion</string>
     <string name="next_badge_info">Next badge: %1$s at %2$d steps</string>
     <string name="highest_badge_unlocked">Highest badge unlocked!</string>
+    <string name="treasure_hunt_progress">Treasure Hunt Progress</string>
+    <string name="use_current_location">Use Current Location</string>
 </resources>
