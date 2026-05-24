@@ -32,4 +32,14 @@
         <string name="longitude_hint">देशांतर (Longitude)</string>
         <string name="take_photo">फोटो लें</string>
         <string name="retake_photo">फिर से फोटो लें</string>
+        <string name="safari_progress_title">सफ़ारी एक्सप्लोरर प्रगति</string>
+        <string name="safari_steps_count">सफ़ारी कदम: %1$d</string>
+        <string name="current_badge_label">वर्तमान बैज: %1$s</string>
+        <string name="reset_steps_btn">सफ़ारी कदम रीसेट करें</string>
+        <string name="badge_new_explorer">नया एक्सप्लोरर</string>
+        <string name="badge_junior_explorer">जूनियर एक्सप्लोरर</string>
+        <string name="badge_safari_tracker">सफ़ारी ट्रैकर</string>
+        <string name="badge_zoo_champion">चिड़ियाघर चैंपियन</string>
+        <string name="next_badge_info">अगला बैज: %2$d कदमों पर %1$s</string>
+        <string name="highest_badge_unlocked">उच्चतम बैज अनलॉक हो गया!</string>
 </resources>

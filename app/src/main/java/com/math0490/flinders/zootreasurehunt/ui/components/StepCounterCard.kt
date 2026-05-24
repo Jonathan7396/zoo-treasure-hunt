@@ -32,9 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.math0490.flinders.zootreasurehunt.R
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -104,11 +106,6 @@ fun StepCounterCard() {
 
                             var baseline = sharedPreferences.getInt("step_baseline", -1)
 
-                            /*
-                             * TYPE_STEP_COUNTER reports total steps since last device reboot.
-                             * If baseline is -1, this is the first reading.
-                             * If rawSteps < baseline, the phone probably rebooted and the raw count reset.
-                             */
                             if (baseline == -1 || rawSteps < baseline) {
                                 baseline = rawSteps
                                 sharedPreferences.edit()
@@ -132,8 +129,6 @@ fun StepCounterCard() {
                             val magnitude = sqrt(x * x + y * y + z * z)
                             val now = System.currentTimeMillis()
 
-                            // First accelerometer reading is only used as a starting point.
-                            // Do not count it as a step.
                             if (lastMagnitude == 0f) {
                                 lastMagnitude = magnitude
                                 return
@@ -178,7 +173,7 @@ fun StepCounterCard() {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Safari Explorer Progress",
+                text = stringResource(R.string.safari_progress_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -188,7 +183,7 @@ fun StepCounterCard() {
             when {
                 stepSensor != null && !hasPermission -> {
                     Text(
-                        text = "Permission required to access hardware step counter.",
+                        text = "Allow step tracking to unlock safari explorer badges.",
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -216,14 +211,14 @@ fun StepCounterCard() {
 
                 else -> {
                     Text(
-                        text = "Safari steps: $safariSteps",
+                        text = stringResource(R.string.safari_steps_count, safariSteps),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Current badge: ${badgeInfo.currentBadge}",
+                        text = stringResource(R.string.current_badge_label, stringResource(badgeInfo.currentBadgeRes)),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -231,7 +226,11 @@ fun StepCounterCard() {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = badgeInfo.nextBadgeText,
+                        text = if (badgeInfo.nextBadgeRes != null) {
+                            stringResource(R.string.next_badge_info, stringResource(badgeInfo.nextBadgeRes), badgeInfo.nextBadgeSteps)
+                        } else {
+                            stringResource(R.string.highest_badge_unlocked)
+                        },
                         style = MaterialTheme.typography.bodySmall
                     )
 
@@ -256,7 +255,7 @@ fun StepCounterCard() {
                                 .apply()
                         }
                     ) {
-                        Text(text = "Reset Safari Steps")
+                        Text(text = stringResource(R.string.reset_steps_btn))
                     }
                 }
             }
@@ -265,8 +264,9 @@ fun StepCounterCard() {
 }
 
 private data class SafariBadgeInfo(
-    val currentBadge: String,
-    val nextBadgeText: String,
+    val currentBadgeRes: Int,
+    val nextBadgeRes: Int?,
+    val nextBadgeSteps: Int,
     val progress: Float
 )
 
@@ -284,26 +284,30 @@ private fun hasActivityRecognitionPermission(context: Context): Boolean {
 private fun getSafariBadgeInfo(steps: Int): SafariBadgeInfo {
     return when {
         steps >= 1000 -> SafariBadgeInfo(
-            currentBadge = "Zoo Champion",
-            nextBadgeText = "Highest badge unlocked!",
+            currentBadgeRes = R.string.badge_zoo_champion,
+            nextBadgeRes = null,
+            nextBadgeSteps = 1000,
             progress = 1f
         )
 
         steps >= 500 -> SafariBadgeInfo(
-            currentBadge = "Safari Tracker",
-            nextBadgeText = "Next badge: Zoo Champion at 1000 steps",
+            currentBadgeRes = R.string.badge_safari_tracker,
+            nextBadgeRes = R.string.badge_zoo_champion,
+            nextBadgeSteps = 1000,
             progress = ((steps - 500).toFloat() / 500f).coerceIn(0f, 1f)
         )
 
         steps >= 100 -> SafariBadgeInfo(
-            currentBadge = "Junior Explorer",
-            nextBadgeText = "Next badge: Safari Tracker at 500 steps",
+            currentBadgeRes = R.string.badge_junior_explorer,
+            nextBadgeRes = R.string.badge_safari_tracker,
+            nextBadgeSteps = 500,
             progress = ((steps - 100).toFloat() / 400f).coerceIn(0f, 1f)
         )
 
         else -> SafariBadgeInfo(
-            currentBadge = "New Explorer",
-            nextBadgeText = "Next badge: Junior Explorer at 100 steps",
+            currentBadgeRes = R.string.badge_new_explorer,
+            nextBadgeRes = R.string.badge_junior_explorer,
+            nextBadgeSteps = 100,
             progress = (steps.toFloat() / 100f).coerceIn(0f, 1f)
         )
     }

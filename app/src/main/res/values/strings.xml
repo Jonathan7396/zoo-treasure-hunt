@@ -30,5 +30,14 @@
     <string name="longitude_hint">Longitude</string>
     <string name="take_photo">Take Photo</string>
     <string name="retake_photo">Retake Photo</string>
-
+    <string name="safari_progress_title">Safari Explorer Progress</string>
+    <string name="safari_steps_count">Safari steps: %1$d</string>
+    <string name="current_badge_label">Current badge: %1$s</string>
+    <string name="reset_steps_btn">Reset Safari Steps</string>
+    <string name="badge_new_explorer">New Explorer</string>
+    <string name="badge_junior_explorer">Junior Explorer</string>
+    <string name="badge_safari_tracker">Safari Tracker</string>
+    <string name="badge_zoo_champion">Zoo Champion</string>
+    <string name="next_badge_info">Next badge: %1$s at %2$d steps</string>
+    <string name="highest_badge_unlocked">Highest badge unlocked!</string>
 </resources>
